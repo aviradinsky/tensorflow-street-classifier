@@ -6,7 +6,7 @@ import numpy as np
 from PIL import Image, ImageDraw as D
 
 
-#crops the images into 
+#crops the images into 200 x 200 smaller images and saves them along with its location on the original picture in the pictures list
 def movingWindow(image):
     stepSize = 200
     pictures = []
@@ -22,7 +22,7 @@ def movingWindow(image):
             pictures.append(pict)
             print([x, y, newx, newy])
             # newimg.show()
-    
+    #displays all of the images in one pyplot
     fig = plt.figure()
     columns = (x//200)+1
     rows = (y//200)+1
