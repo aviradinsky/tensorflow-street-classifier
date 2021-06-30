@@ -4,13 +4,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
 
-import tensorflow_datasets as tfds
-
 from PIL import Image, ImageDraw as D
 from operator import mul
 import json
-import pickle
-import matplotlib.pyplot as plt
+import os
 
 #%%
 objects = ["bicycle", "motorcycle", "bus", "truck", "car", "train",
@@ -27,6 +24,7 @@ conversion_dict = {
     11:8,#stop sign
     10:9#fire hydrant
 }
+
 #%%
 def string_to_array(str: str):
     array = str[1:-1].split(',')
@@ -51,24 +49,36 @@ def myprint(d):
         if isinstance(v, dict):
             myprint(v)
         
+        # need to deal with bytes
+        elif k == 'image':
+            im = Image.fromarray(v)
+            global image_count
+            os.mkdir('data/' + str(image_count))
+            im.save('data/' + str(image_count) + '/im_' + str(image_count) + '.jpeg')
+            image_count += 1
+            # plt.figure()
+            # plt.imshow(image)
+            # plt.show()
+
         else:
             if isinstance(v, np.ndarray):
                 v= str(v.tolist())
-            if isinstance(v, bytes):
+            elif isinstance(v, bytes):
                 v= v.decode("utf-8")
-            if k == 'label':
+            elif k == 'label':
                 #print('begin')
                 #print(string_to_array(v))
                 #print('end')
                 image = example['image']
-                plt.figure()
-                plt.imshow(image)
-                plt.show()
+                # plt.figure()
+                # plt.imshow(image)
+                # plt.show()
                 v = change_label_array(v)
                 print(v)
-
-            dataSet.write(("{0} : {1}".format(k, v)))
-            dataSet.write("\n")
+            # dataSet = open("data/" + str(image_count) + "/meta_" + str(image_count) + ".txt", "w")
+            # dataSet.write(("{0} : {1}".format(k, v)))
+            # dataSet.write("\n")
+            # dataSet.close()
     
 #%%
 ds, info = tfds.load('coco', split='train', with_info=True)
@@ -77,7 +87,7 @@ file = open(r"/home/ubuntu/tensorflow_datasets/coco/2014/1.1.0/objects-label.lab
 word = file.readlines()
 #print(word)
 lines = []
-dataSet = open("DataSet.txt", "w")
+image_bytes = open("image_bytes.txt", "wb")
 for obj in objects:
     #print(obj)
     for count, value in enumerate(word):
@@ -86,12 +96,14 @@ for obj in objects:
 
 
 #%%
+os.mkdir('data')
 x = 0
+image_count = 0
 # remove breakpoint to continue though whole dataset
 for example in ds:  # (image[], labels[], objects[], bbox[])
-    if x == 20:
+    if x == 15:
         break
-
+    print(example['image'].shape)
     image = example['image']
     labels = example['objects']['label']
     bboxes = example['objects']['bbox'] 
@@ -103,5 +115,8 @@ for example in ds:  # (image[], labels[], objects[], bbox[])
     x += 1
 
 
-file.close
-dataSet.close
+file.close()
+image_bytes.close()
+
+
+# %%)
