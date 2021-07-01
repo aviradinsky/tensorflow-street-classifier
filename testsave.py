@@ -35,7 +35,7 @@ def change_label_array(v):
     v =v.tolist()
     for i in range(len(v)):
         v[i] = conversion_dict.get(v[i])
-    return [x for x in v if x is not None]
+    return v
 
 def saveData(d): # (image: nparray[], image/filename: byte, ,image/id, numpy int64 objects:{area : nparray[]int64, bbox: nparray[], id: nparray[]float32, is_crowd : nparray[] bool, label : nparray[]int64})
     try:
@@ -43,6 +43,10 @@ def saveData(d): # (image: nparray[], image/filename: byte, ,image/id, numpy int
     except OSError as error:
         print("already dir")
     img= d['image'] 
+    raw_lables = change_label_array(d['objects']['label']) # this still has None values within
+    raw_bboxes = d['objects']['bbox'].tolist()
+    cleaned_bboxes = [box for i, box in enumerate(raw_bboxes) if raw_lables[i] is not None]
+
     im = Image.fromarray(img)
     im.save('data/' + str(image_count) + '/im_' + str(image_count) + '.jpeg')
     del d['image'] 
@@ -53,13 +57,13 @@ def saveData(d): # (image: nparray[], image/filename: byte, ,image/id, numpy int
    
     d['objects']['area'] = d['objects']['area'].tolist()
    
-    d['objects']['bbox']= d['objects']['bbox'].tolist()
+    d['objects']['bbox'] = cleaned_bboxes
     d['objects']['id']= (d['objects']['id'].astype(np.int32))
    
     d['objects']['id']= d['objects']['id'].tolist()
     d['objects']['is_crowd']= d['objects']['is_crowd'].tolist()
     
-    d['objects']['label']= change_label_array(d['objects']['label'])
+    d['objects']['label'] = [i for i in raw_lables if i is not None]
  
     
     dataFile = open(os.getcwd()+"/data/" + str(image_count) + "/data_" + str(image_count) + ".json", "w")
@@ -68,7 +72,7 @@ def saveData(d): # (image: nparray[], image/filename: byte, ,image/id, numpy int
 
 ds, info = tfds.load('coco', split='train', with_info=True)
 ds = tfds.as_numpy(ds)
-path_to_labels = r"C:\Users\jakes\tensorflow_datasets\coco\2014\1.1.0\objects-label.labels.txt"
+path_to_labels = r"/home/ubuntu/tensorflow_datasets/coco/2014/1.1.0/objects-label.labels.txt"
 with open(path_to_labels) as labels_file :
     word = labels_file.readlines()
 #print(word)
