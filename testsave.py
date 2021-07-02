@@ -72,7 +72,7 @@ def saveData(d): # (image: nparray[], image/filename: byte, ,image/id, numpy int
 
 ds, info = tfds.load('coco', split='train', with_info=True)
 ds = tfds.as_numpy(ds)
-path_to_labels = r"/home/ubuntu/tensorflow_datasets/coco/2014/1.1.0/objects-label.labels.txt"
+path_to_labels = r"objects-label.labels.txt"
 with open(path_to_labels) as labels_file :
     word = labels_file.readlines()
 #print(word)
