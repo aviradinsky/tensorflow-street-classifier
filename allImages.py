@@ -22,7 +22,7 @@ conversion_dict = {
 x=0
 while True:
     print(x)
-    s = r'C:\Users\jakes\tensorflow-street-classifier\data/' + str(x)+ "/data_"+str(x)+ ".json" 
+    s = os.getcwd()+'/data/' + str(x)+ "/data_"+str(x)+ ".json" 
     try:
         file = open( s)
     except OSError as error:
