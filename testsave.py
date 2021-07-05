@@ -70,7 +70,7 @@ def saveData(d): # (image: nparray[], image/filename: byte, ,image/id, numpy int
     json.dump(d, dataFile)       
     
 
-ds, info = tfds.load('coco', split='train', with_info=True)
+ds, info = tfds.load('coco', with_info=True)
 ds = tfds.as_numpy(ds)
 path_to_labels = r"objects-label.labels.txt"
 with open(path_to_labels) as labels_file :
@@ -88,18 +88,19 @@ lines = conversion_dict.keys()
 # ************************************************************
 x = 0
 # remove breakpoint to continue though whole dataset
-for example in ds:  # (image[], labels[], objects[], bbox[])
-    if x == 7:
-        break
-    image = example['image']
-    labels = example['objects']['label']
-    bboxes = example['objects']['bbox'] 
+for files, v in ds.items():  # (image[], labels[], objects[], bbox[])
+    print(files)
+    for example in v:
+        
+        labels = example['objects']['label'] 
 
-    #print(labels)
-    # print(bboxes)  # [y_min, x_min, y_max, x_max]
-    if (set(lines) & set(labels)):
-        saveData(example)      
-        image_count += 1
-    x += 1
+        #print(labels)
+        # print(bboxes)  # [y_min, x_min, y_max, x_max]
+        if (set(lines) & set(labels)):
+            print(image_count)
+            #print(example['image/filename'])
+            saveData(example)      
+            image_count += 1
+        x += 1
 
 
