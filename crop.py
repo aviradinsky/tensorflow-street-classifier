@@ -44,17 +44,25 @@ while True:
     labels= data['objects']['label']
     boxes = data['objects']['bbox'] # [y_min, x_min, y_max, x_max]
     bbox = []
+    broken =[]
     for b in boxes:
-        bbox.append([b[1]*width, b[0]*height,b[3]*width, b[2]*height]) #(x, y, x, y)
+        bbox.append([int(b[1]*width), int(b[0]*height),int(b[3]*width), int(b[2]*height)] ) #(x, y, x, y)
     boxandlabels = zip(labels,bbox)
     i=0
+    
     for l, b in boxandlabels: 
+        if(b[0]==b[2] or b[1]==b[3]):
+            broken.append(b)   
+            print(b)
+            continue
         location = str(os.getcwd()+'/instances/' + conversion_dict[l])
         imageName = "/im_"+str(x)+ "_"+str(i)+".jpeg"
+       
         crop = image.crop(b) #crops image
         #crop.show()
+        
         crop.save(location+imageName) #saves image
         i+=1
     x+=1
 
-        
+print(broken)       
