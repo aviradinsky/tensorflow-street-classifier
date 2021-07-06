@@ -2,6 +2,7 @@
 import tensorflow as tf
 import tensorflow_datasets as tfds
 import matplotlib.pyplot as plt
+import os
 # %%
 # loading the data
 chosen_labels = [
@@ -16,45 +17,55 @@ chosen_labels = [
     11, # stop sign
     10 # fire hydrant
 ]
-data = tfds.load('coco').get('train')
-# print(type(data))  <class 'tensorflow.python.data.ops.dataset_ops.PrefetchDataset'>
 # %%
-# this is just a holder until i use all of the data
+# check if directories exist
+root = f'{os.getcwd()}/cropped_images'
+for i in range(10):
+    if os.path.exists(f'{root}/{i}'):
+        continue
+    else:
+        os.makedirs(f'{root}/{i}')
+#%%
+data = tfds.load('coco').get('train')
+# %%
 i = 1
+global count
+count = 0
 for sample in data:
-    if i > 5:
+    if i > 105:
         break
     else:
         i += 1
-    #print(type(sample)) dict
-    #print(sample.keys()) IMAGE, IMAGE/FILENAME, IMAGE/ID, OBJECTS
+
     image = sample.get('image')
     objects = sample.get('objects')
-    # print(objects.keys()) 'area', 'bbox', 'id', 'is_crowd', 'label'
     all_labels = objects.get('label').numpy()
-    #plt.figure()
-    #plt.imshow(image)
-    #plt.show()
     for j, label in enumerate(all_labels):
         if label in chosen_labels:
             bbox = objects.get('bbox').numpy()[j]
-            top_point = bbox[0]*image.shape[0]
-            left_point = bbox[1]*image.shape[1]
-            bottom_point= bbox[2]*image.shape[0]
-            right_point= bbox[3]*image.shape[1]
 
-            #print(f'{bbox[3]*image.shape[1]}')
+            top_line = bbox[0]*image.shape[0]
+            left_line = bbox[1]*image.shape[1]
+            bottom_line = bbox[2]*image.shape[0]
+            right_line = bbox[3]*image.shape[1]
+
+            offset_height=int(top_line)
+            offset_width=int(left_line)
+            target_height=int(bottom_line - top_line)
+            target_width=int(right_line - left_line)
+
+            if target_height == 0 or target_width == 0:
+                continue
+
             cropped_image = tf.image.crop_to_bounding_box(image,
-                offset_height=int(top_point),
-                offset_width=int(left_point),
-                target_height=int(bottom_point - top_point),
-                target_width=int(right_point - left_point)
+                offset_height=offset_height,
+                offset_width=offset_width,
+                target_height=target_height,
+                target_width=target_width
             )
-            plt.figure()
-            plt.imshow(cropped_image)
-            plt.show()
-            pass
 
-# %%
+            file_name = f'{count}'
+            count += 1
+            file_location = f'{root}/{chosen_labels.index(label)}'
+            tf.keras.preprocessing.image.save_img(f'{file_location}/{file_name}.png',cropped_image.numpy())
 
-# %%
