@@ -23,6 +23,7 @@ chosen_labels = [
 ]
 # %%
 # check if directories exist
+# if directories exist it assumes that all data is downloaded and the code begins running the model stuff
 no_images = True
 root = f'{os.getcwd()}/cropped_images'
 for i in range(10):
@@ -100,14 +101,13 @@ num_classes = len(chosen_labels)
 
 model = Sequential([
   layers.experimental.preprocessing.Rescaling(1./255, input_shape=(256, 256, 3)),
-  layers.Flatten(input_shape=(256,256,3)),
-  layers.Dense(256,activation='relu'),
-  layers.Dense(256,activation='relu'),
-  layers.Dense(256,activation='relu'),
-  layers.Dense(256,activation='relu'),
-  layers.Dense(256,activation='relu'),
-  layers.Dense(256,activation='relu'),
-  layers.Dense(256,activation='relu'),
+  layers.Conv2D(16, 3, padding='same', activation='relu'),
+  layers.MaxPooling2D(),
+  layers.Conv2D(32, 3, padding='same', activation='relu'),
+  layers.MaxPooling2D(),
+  layers.Conv2D(64, 3, padding='same', activation='relu'),
+  layers.MaxPooling2D(),
+  layers.Flatten(),
   layers.Dense(128, activation='relu'),
   layers.Dense(num_classes)
 ])
@@ -116,9 +116,32 @@ model.compile(optimizer='adam',
               loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
               metrics=['accuracy'])
 # %%
-epochs=1
+epochs=10
 history = model.fit(
   train_data,
   validation_data=validate_data,
   epochs=epochs
 )
+
+# %%
+acc = history.history['accuracy']
+val_acc = history.history['val_accuracy']
+
+loss = history.history['loss']
+val_loss = history.history['val_loss']
+
+epochs_range = range(epochs)
+
+plt.figure(figsize=(8, 8))
+plt.subplot(1, 2, 1)
+plt.plot(epochs_range, acc, label='Training Accuracy')
+plt.plot(epochs_range, val_acc, label='Validation Accuracy')
+plt.legend(loc='lower right')
+plt.title('Training and Validation Accuracy')
+
+plt.subplot(1, 2, 2)
+plt.plot(epochs_range, loss, label='Training Loss')
+plt.plot(epochs_range, val_loss, label='Validation Loss')
+plt.legend(loc='upper right')
+plt.title('Training and Validation Loss')
+plt.show()
