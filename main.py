@@ -56,7 +56,7 @@ if no_images:
                 target_height=int(bottom_line - top_line)
                 target_width=int(right_line - left_line)
 
-                if target_height == 0 or target_width == 0:
+                if target_height == 0 or target_width == 0 or top_line == 0 or right_line == 0:
                     continue
 
                 cropped_image = tf.image.crop_to_bounding_box(image,
@@ -70,7 +70,9 @@ if no_images:
                 count += 1
                 file_location = f'{root}/{chosen_labels.index(label)}'
                 tf.keras.preprocessing.image.save_img(f'{file_location}/{file_name}.png',cropped_image.numpy())
-                print(f'Number of images placed into directory structure: {count}')
+                if count % 1000 == 0:
+                    print(f'Number of images placed into directory structure: {count}')
+                    break
 
 
 # %%
