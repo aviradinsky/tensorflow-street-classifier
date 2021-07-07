@@ -19,17 +19,17 @@ conversion_dict = {
     8: 'stop sign',
     9: 'fire hydrant',
 }
-file = open("small.txt","w")
+
 for name in conversion_dict.values():
     print(name)
     directory = os.getcwd()+'/instances/' + name
     for file in os.listdir(directory):
         try:
             image = Image.open(directory+"/" +file)
-            if(image.height<5 or image.width<5):
-                print(directory+"/" +file,image.height,image.width )
+            # if(image.height<5 or image.width<5):
+                #print(directory+"/" +file,image.height,image.width )
                 
         except:
             print(directory+"/" +file)
-            os.remove(directory+"/" +file)
+            #os.remove(directory+"/" +file)
  
