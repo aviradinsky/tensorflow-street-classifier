@@ -24,11 +24,12 @@ for name in conversion_dict.values():
     print(name)
     directory = os.getcwd()+'/instances/' + name
     for file in os.listdir(directory):
-    
-        image = Image.open(directory+"/" +file)
-        if(image.height<5 or image.width<5):
-            print(directory+"/" +file,image.height,image.width ,"\n" )
-
-
-        
-   
+        try:
+            image = Image.open(directory+"/" +file)
+            # if(image.height<5 or image.width<5):
+                #print(directory+"/" +file,image.height,image.width )
+                
+        except:
+            print(directory+"/" +file)
+            #os.remove(directory+"/" +file)
+ 

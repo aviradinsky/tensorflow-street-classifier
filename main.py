@@ -128,7 +128,7 @@ model.compile(optimizer='adam',
                   from_logits=True),
               metrics=['accuracy'])
 # %%
-epochs = 4
+epochs = 10
 history = model.fit(
     train_data,
     validation_data=validate_data,
@@ -158,12 +158,28 @@ plt.legend(loc='upper right')
 plt.title('Training and Validation Loss')
 plt.show()
 """
-Epoch 1/4
-6946/6946 [==============================] - 618s 89ms/step - loss: 0.6833 - accuracy: 0.7988 - val_loss: 0.4681 - val_accuracy: 0.8526
-Epoch 2/4
-6946/6946 [==============================] - 607s 87ms/step - loss: 0.4437 - accuracy: 0.8599 - val_loss: 0.4272 - val_accuracy: 0.8698
-Epoch 3/4
-6946/6946 [==============================] - 607s 87ms/step - loss: 0.3863 - accuracy: 0.8775 - val_loss: 0.4032 - val_accuracy: 0.8745
-Epoch 4/4
-6946/6946 [==============================] - 610s 88ms/step - loss: 0.3494 - accuracy: 0.8881 - val_loss: 0.4160 - val_accuracy: 0.8758
+Found 246943 files belonging to 10 classes.
+Using 222249 files for training.
+Found 246943 files belonging to 10 classes.
+Using 24694 files for validation.
+Epoch 1/10
+6946/6946 [==============================] - 895s 107ms/step - loss: 0.6827 - accuracy: 0.7991 - val_loss: 0.4739 - val_accuracy: 0.8518
+Epoch 2/10
+6946/6946 [==============================] - 638s 92ms/step - loss: 0.4361 - accuracy: 0.8623 - val_loss: 0.4173 - val_accuracy: 0.8685
+Epoch 3/10
+6946/6946 [==============================] - 602s 87ms/step - loss: 0.3788 - accuracy: 0.8803 - val_loss: 0.4230 - val_accuracy: 0.8701
+Epoch 4/10
+6946/6946 [==============================] - 602s 87ms/step - loss: 0.3427 - accuracy: 0.8901 - val_loss: 0.4407 - val_accuracy: 0.8681
+Epoch 5/10
+6946/6946 [==============================] - 605s 87ms/step - loss: 0.3161 - accuracy: 0.8986 - val_loss: 0.4199 - val_accuracy: 0.8732
+Epoch 6/10
+6946/6946 [==============================] - 601s 87ms/step - loss: 0.2962 - accuracy: 0.9032 - val_loss: 0.4259 - val_accuracy: 0.8750
+Epoch 7/10
+6946/6946 [==============================] - 601s 87ms/step - loss: 0.2769 - accuracy: 0.9099 - val_loss: 0.4270 - val_accuracy: 0.8756
+Epoch 8/10
+6946/6946 [==============================] - 601s 87ms/step - loss: 0.2628 - accuracy: 0.9140 - val_loss: 0.4574 - val_accuracy: 0.8770
+Epoch 9/10
+6946/6946 [==============================] - 601s 86ms/step - loss: 0.2509 - accuracy: 0.9179 - val_loss: 0.4569 - val_accuracy: 0.8708
+Epoch 10/10
+6946/6946 [==============================] - 606s 87ms/step - loss: 0.2351 - accuracy: 0.9230 - val_loss: 0.4458 - val_accuracy: 0.8749
 """
