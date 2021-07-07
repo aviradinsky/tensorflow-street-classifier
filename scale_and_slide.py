@@ -9,31 +9,45 @@ from PIL import Image
 #%%
 
 def simple_display_image(img: Image.Image):
+    """displays single image in pyplot
+
+    Args:
+        img (PIL.Image.Image): image to display
+    """
+
     plt.figure()
     plt.imshow(img)
     plt.show()
 
 #%%
 
-def display_crops(img: Image.Image, crops: list):
+def display_crops(img: Image.Image, crops: list, 
+                  window_dimensions: tuple, stride: int):
+    """displays gropu of image crops in a nicely formated rectangle
+
+    Args:
+        img (PIL.Image.Image): image whose crops are being displayed
+        crops (list): list of image crops
+        window_dimensions (tuple): dimensions of the cropping window
+        stride (int): the stride
+    """
+    print('BEGIN PYPLOT CROPS DISPLAY')
     rows = 1 + math.ceil((img.height - window_dimensions[1]) / stride)
     columns = 1 + math.ceil((img.width - window_dimensions[0]) / stride)
     figsize = (10 * columns, 10 * rows)
 
-    print('num rows: ' + str(rows))
-    print('num columns: ' + str(columns))
+    print('rows: ' + str(rows))
+    print('columns: ' + str(columns))
 
     fig = plt.figure(figsize=figsize)
 
     for i in range(0, columns * rows):
-        try:
-            fig.add_subplot(rows, columns, i + 1)
-            plt.imshow(crops[i]) 
-        except IndexError as ie:
-            print('index error at index: ' + str(i))
-            raise ie
+        fig.add_subplot(rows, columns, i + 1)
+        plt.imshow(crops[i])
 
     plt.show()
+
+    print('END PYPLOT CROPS DISPLAY \n')
 
 #%%
 
@@ -41,10 +55,10 @@ def get_scaled_images(img: Image.Image, count: int, increment: float):
     """returns a list of multiple versions of one image, each of a 
     differnt size
     Args:
+        img (PIL.Image.Image): image to resize
         count (int): number of images to return (will be length of the 
         array that is returned)
         increment (float): percentage increase from one size to the next
-        img (numpy.array): image to resize
     Returns:
         list of PIL.Image.Image: the resized images
     """
@@ -88,7 +102,7 @@ def get_scaled_images(img: Image.Image, count: int, increment: float):
         imgs.append(img.resize(new_dims))
         print('image size: ', new_dims)
 
-    print('END IMAGE RESCALING')
+    print('END IMAGE RESCALING \n')
 
     return imgs
 
@@ -99,22 +113,32 @@ def sliding_window(image: Image.Image, window_dim: tuple, stride: int):
     inside of the bounding box after each iteration. The crops are
     returned inside of an array
     Args:
-        image (np.array): the image from which the crops wil be made
+        image (PIL.Image.Image): the image from which the crops wil be made
         window_dim (tuple): the dimensions of the sliding window, where
                             the 0th index holds the width and 1st slot
                             holds the width
         stride (int): how much to slide the window after 
                                each iteration
+
+    Raises:
+        ValueError: if window_dim is larger than image to crop
+
     Returns:
         list of PIL.Image.Image: the cropped images
     """
-    print('sliding window over im size: ' + str(image.size))
+    
+    if window_dim[0] > image.width or window_dim[1] > image.height:
+        raise ValueError('window dimension is larger than image')
+
+    print('START WINDOW SLIDING')
+    print('cropping im size:' + str(image.size))
+
     pictures = []
 
     tally = 0
 
-    for y in range(0, image.height - stride, stride):
-        for x in range(0, image.width - stride, stride):
+    for y in range(0, image.height, stride):
+        for x in range(0, image.width, stride):
             tally += 1
             # set crop bounds
             left_bound = x
@@ -123,21 +147,26 @@ def sliding_window(image: Image.Image, window_dim: tuple, stride: int):
             lower_bound = upper_bound + window_dim[1]
 
             # adjust bounds in cases of overflow
-            if img.height < upper_bound + window_dim[1]:
-                upper_bound = img.height - window_dim[1]
-                lower_bound = img.height
+            if image.height < lower_bound:
+                upper_bound = image.height - window_dim[1]
+                lower_bound = image.height
 
-            if img.width < left_bound + window_dim[0]:
-                left_bound = img.width - window_dim[0]
-                right_bound = img.width
+            if image.width < right_bound:
+                left_bound = image.width - window_dim[0]
+                right_bound = image.width
             
             crop_bounds = [left_bound, upper_bound, right_bound, lower_bound]
 
-            crop = img.crop(crop_bounds)
+            crop = image.crop(crop_bounds)
             pict = [crop, crop_bounds]
             pictures.append(pict)
 
+            if right_bound == image.width:
+                break
+
     print('total sliding crops: ' + str(tally))
+
+    print('END WINDOW SLIDING \n')
 
     return [im for [im, dims] in pictures]
 
@@ -148,7 +177,7 @@ def get_image_chunks(img: Image.Image, window_dim: tuple, stride: int,
     """Generates sub-images by resizing the image and running a sliding
     window across each of the resized images
     Args:
-        img (np.ndarray): image to process
+        img (PIL.Image.Image): image to process
         window_dim (tuple): dimensions of the sliding window
         stride (int): amount to slide the window after 
                                each iteration
@@ -156,8 +185,8 @@ def get_image_chunks(img: Image.Image, window_dim: tuple, stride: int,
         rescale_increment (float): fraction by which to increase image 
                                    after each resize
     Returns:
-        list: a nested list of lists of PIL.Image.Image of cropped images. Each
-        resized image is stored inside of its own list
+        list: a nested list of lists of PIL.Image.Image of cropped images.
+        Each resized image is stored inside of its own list
     """
 
     # first task - rescale the image into multiple sizes
@@ -169,8 +198,6 @@ def get_image_chunks(img: Image.Image, window_dim: tuple, stride: int,
     crops = []
     
     for im in scaled_images:
-        print('cropping im size:')
-        print(im.size)
         crops.append(sliding_window(im, window_dim, stride))
         
 
@@ -181,22 +208,22 @@ def get_image_chunks(img: Image.Image, window_dim: tuple, stride: int,
 # ************************************
 # SAMPLE TEST
 # ************************************
+def test():
+    img = Image.open('test.jpg')
+    window_dimensions = (115, 175)
+    stride = 50
+    num_rescales = 3
+    rescale_increment = .5
 
-img = Image.open('test.jpg')
-window_dimensions = (200, 200)
-stride = 100
-num_rescales = 3
-rescale_increment = .5
+    crops = get_image_chunks(img, window_dimensions, stride,
+                            num_rescales, rescale_increment)
 
-crops = get_image_chunks(img, window_dimensions, stride,
-                         num_rescales, rescale_increment)
+    rescaled_images = get_scaled_images(img, num_rescales, rescale_increment)
+    simple_display_image(img)
 
-rescaled_images = get_scaled_images(img, num_rescales, rescale_increment)
-simple_display_image(img)
-
-
-# display_crops(rescaled_images[0], crops[0])
-# display_crops(rescaled_images[1], crops[1])
-display_crops(rescaled_images[2], crops[2])
+    for i in range(num_rescales):
+        display_crops(rescaled_images[i], crops[i], window_dimensions, stride)
+    
+test()
 
 # %%
