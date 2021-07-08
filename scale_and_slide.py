@@ -44,6 +44,7 @@ def display_crops(img: Image.Image, crops: list,
     for i in range(0, columns * rows):
         fig.add_subplot(rows, columns, i + 1)
         plt.imshow(crops[i])
+        plt.axis('off')
 
     plt.show()
 
@@ -51,7 +52,7 @@ def display_crops(img: Image.Image, crops: list,
 
 #%%
 
-def get_scaled_images(img: Image.Image, count: int, increment: float):
+def get_scaled_images(img: Image.Image, count=3, increment=.5):
     """returns a list of multiple versions of one image, each of a 
     differnt size
     Args:
@@ -71,37 +72,24 @@ def get_scaled_images(img: Image.Image, count: int, increment: float):
 #     ex-odd: math.ceiling(3/2) - 1 = 1  ---  num == 3
 #     ex-even: math.ceiling(4/2) - 1 = 1  ---  num == 4
 
-    # increment is less than one; adding it to one will cause an 
-    # increase in image resizing
     print('START IMAGE RESCALING')
-    increment += 1
-    num_smaller_images = math.floor(count/2)
-    num_larger_images = math.ceil(count/2) - 1
-    img_dims = img.size
     imgs = []
 
-    # add smaller images to list first 
-    for i in range(num_smaller_images) :
-        resize_amount = 1 / (increment ** (num_smaller_images - i))
-        width = img_dims[0] * resize_amount
-        length = img_dims[1] * resize_amount
-        new_dims = (int(width), int(length))
+    # add images from smallest to largest
+    for i in range(count - 1) :
+        resize_amount = increment ** (count - 1 - i)
+        new_dims = (
+                    int(img.width * resize_amount), 
+                    int(img.height * resize_amount)
+                    )
+        # new_dims = (int(width), int(length))
         imgs.append(img.resize(new_dims))
         print('image size: ', new_dims)
 
     # apppend the original image before adding larger images
     imgs.append(img)
+    
     print('original image size: ', tuple(img.size))
-
-    # append larger images
-    for i in reversed(range(num_larger_images)) :
-        resize_amount = increment ** (num_larger_images - i)
-        width = img_dims[0] * resize_amount
-        length = img_dims[1] * resize_amount
-        new_dims = (int(width), int(length))
-        imgs.append(img.resize(new_dims))
-        print('image size: ', new_dims)
-
     print('END IMAGE RESCALING \n')
 
     return imgs
@@ -128,7 +116,8 @@ def sliding_window(image: Image.Image, window_dim: tuple, stride: int):
     """
     
     if window_dim[0] > image.width or window_dim[1] > image.height:
-        raise ValueError('window dimension is larger than image')
+        raise ValueError('window dimension of ' + str(window_dim) + ' is \
+                         larger than image of size: ' + str(image.size))
 
     print('START WINDOW SLIDING')
     print('cropping im size:' + str(image.size))
@@ -210,7 +199,7 @@ def get_image_chunks(img: Image.Image, window_dim: tuple, stride: int,
 # ************************************
 def test():
     img = Image.open('test.jpg')
-    window_dimensions = (115, 175)
+    window_dimensions = (75, 100)
     stride = 50
     num_rescales = 3
     rescale_increment = .5
