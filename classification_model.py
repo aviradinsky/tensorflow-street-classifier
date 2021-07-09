@@ -252,7 +252,7 @@ object = {
     10: 'background'
     }
 img = keras.preprocessing.image.load_img(
-    '/home/ubuntu/tensorflow-street-classifier/cropped_images/test/0/1279.png', target_size=(256, 256)
+    str(os.getcwd()+ '/cropped_images/test/0/1279.png'), target_size=(256, 256)
 )
 img_array = keras.preprocessing.image.img_to_array(img)
 img_array = tf.expand_dims(img_array, 0) # Create a batch
