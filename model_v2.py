@@ -88,9 +88,9 @@ def load_data(key: str) -> tf.data.Dataset:
     )
 
 
-valid_keys = ('train','validation','test')
+valid_keys = ('train','validation','test2015')
 
-test_data = load_data('validation')
+test_data = load_data(valid_keys[2])
 
 
 # %%
