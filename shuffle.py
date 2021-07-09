@@ -6,7 +6,7 @@ import os
 from PIL import Image
 from numpy import random
 
-for i in os.listdir('cropped_images/'):
+for i in range(11):
     print(i)
     try:
         os.makedirs('cropped_images/train/'+i)
@@ -33,15 +33,11 @@ for i in os.listdir('cropped_images/'):
         os.rename('cropped_images/'+i+'/'+ valName,'cropped_images/val/'+i+'/'+ valName)  
     for testName in test_data:
         print(testName)
-        os.rename('cropped_images/'+i+'/'+ testName,'cropped_images/test/'+i+'/'+ testName)   
-#%%
-for i in os.listdir('cropped_images/'):
-    try:
-        os.rmdir('cropped_images/'+i)
-    except IOError as e:
-        print("not empty dir")
+        os.rename('cropped_images/'+i+'/'+ testName,'cropped_images/test/'+i+'/'+ testName)  
+    os.rmdir('cropped_images/'+i) 
+
 # %%
-for i in  range(10):
+for i in  range(11):
     tr= os.listdir('cropped_images/train/'+str(i))
     va= os.listdir('cropped_images/val/'+str(i))
     te = os.listdir('cropped_images/test/'+str(i))
