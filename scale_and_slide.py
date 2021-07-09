@@ -27,7 +27,7 @@ def display_crops(img: Image.Image, crops: list,
 
     Args:
         img (PIL.Image.Image): image whose crops are being displayed
-        crops (list): list of image crops
+        crops (list): list of image crops as numpy.arrays
         window_dimensions (tuple): dimensions of the cropping window
         stride (int): the stride
     """
@@ -63,15 +63,7 @@ def get_scaled_images(img: Image.Image, count=3, increment=.5):
     Returns:
         list of PIL.Image.Image: the resized images
     """
-# number of images smaller than img will be determined 
-# by math.floor(num/2)
-#     ex-odd: math.floor(3/2) = 1  ---  num == 3
-#     ex-even: math.floor(4/2) = 2  ---  num == 4
-# number of images larger than img will be determined 
-# by math.ceiling(num/2) - 1
-#     ex-odd: math.ceiling(3/2) - 1 = 1  ---  num == 3
-#     ex-even: math.ceiling(4/2) - 1 = 1  ---  num == 4
-
+    
     print('START IMAGE RESCALING')
     imgs = []
 
@@ -162,7 +154,7 @@ def sliding_window(image: Image.Image, window_dim: tuple, stride: int):
 #%%
 
 def get_image_chunks(img: Image.Image, window_dim: tuple, stride: int, 
-                     num_rescales: int, rescale_increment: float):
+                     num_rescales=3, rescale_increment=5):
     """Generates sub-images by resizing the image and running a sliding
     window across each of the resized images
     Args:
@@ -170,11 +162,11 @@ def get_image_chunks(img: Image.Image, window_dim: tuple, stride: int,
         window_dim (tuple): dimensions of the sliding window
         stride (int): amount to slide the window after 
                                each iteration
-        num_rescales (int): number of rescaled images to make
-        rescale_increment (float): fraction by which to increase image 
-                                   after each resize
+        num_rescales (int, optional): number of rescaled images to make
+        rescale_increment (float, optional): fraction by which to 
+                                 increase image after each resize
     Returns:
-        list: a nested list of lists of PIL.Image.Image of cropped images.
+        list: a nested list of lists of numpay.array of cropped images.
         Each resized image is stored inside of its own list
     """
 
@@ -187,8 +179,9 @@ def get_image_chunks(img: Image.Image, window_dim: tuple, stride: int,
     crops = []
     
     for im in scaled_images:
-        crops.append(sliding_window(im, window_dim, stride))
-        
+        crops_set = sliding_window(im, window_dim, stride)
+        as_arrays = [np.array(x) for x in crops_set]
+        crops.append(as_arrays)
 
     return crops
 
