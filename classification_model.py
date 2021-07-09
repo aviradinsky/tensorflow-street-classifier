@@ -28,6 +28,9 @@ chosen_labels = [
 no_images = True
 root = f'{os.getcwd()}/cropped_images'
 for i in range(len(chosen_labels) + 1):
+    if os.path.exists(f'{root}/test') and os.path.exists(f'{root}/val') and os.path.exists(f'{root}/train'):
+        no_images = False
+        break
     if os.path.exists(f'{root}/{i}'):
         no_images = False
         continue
@@ -91,7 +94,7 @@ if no_images:
                     print(
                         f'Number of images placed into directory structure: {count}')
                     break
-    for i in os.listdir('cropped_images/'):
+    for i in range(11):
         print(i)
         try:
             os.makedirs('cropped_images/train/'+i)
@@ -163,6 +166,8 @@ model = Sequential([
     layers.Dense(128, activation='relu'),
     layers.Dense(num_classes)
 ])
+# %%
+model.summary
 # %%
 model.compile(optimizer='adam',
               loss=tf.keras.losses.SparseCategoricalCrossentropy(
