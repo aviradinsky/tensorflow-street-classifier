@@ -1,3 +1,4 @@
+# %%
 import numpy as np
 import json
 import os
@@ -33,4 +34,18 @@ for i in os.listdir('cropped_images/'):
     for testName in test_data:
         print(testName)
         os.rename('cropped_images/'+i+'/'+ testName,'cropped_images/test/'+i+'/'+ testName)   
-    
+#%%
+for i in os.listdir('cropped_images/'):
+    try:
+        os.rmdir('cropped_images/'+i)
+    except IOError as e:
+        print("not empty dir")
+# %%
+for i in  range(10):
+    tr= os.listdir('cropped_images/train/'+str(i))
+    va= os.listdir('cropped_images/val/'+str(i))
+    te = os.listdir('cropped_images/test/'+str(i))
+    lenght =len(tr)+ len(va)+ len(te)
+    print(len(tr), len(va), len(te))
+    print(len(tr)/lenght, len(va)/lenght, len(te)/lenght)
+# %%
