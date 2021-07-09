@@ -7,6 +7,7 @@ from tensorflow import keras
 from tensorflow.keras import layers
 from tensorflow.keras.models import Sequential
 from tensorflow.python.keras.layers.core import Dense, Dropout, Flatten
+from numpy import random
 # %%
 # loading the data
 chosen_labels = [
@@ -90,27 +91,52 @@ if no_images:
                     print(
                         f'Number of images placed into directory structure: {count}')
                     break
-
-
+    for i in os.listdir('cropped_images/'):
+        print(i)
+        try:
+            os.makedirs('cropped_images/train/'+i)
+            os.makedirs('cropped_images/val/'+i)
+            os.makedirs('cropped_images/test/'+i)
+        except IOError as e:
+            print("already dir")
+        
+        arr= os.listdir('cropped_images/'+i)
+        arr.sort()  # make sure that the filenames have a fixed order before shuffling
+        random.seed(230)
+        random.shuffle(arr)
+        train = int(.8*len(arr))
+        val = int(.9*len(arr))
+        test = len(arr)
+        train_data= arr[0:train]
+        val_data= arr[train:val]
+        test_data= arr[val:test]
+        for trainName in train_data:
+            os.rename('cropped_images/'+i+'/'+ trainName,'cropped_images/train/'+i+'/'+ trainName)
+        for valName in val_data:
+            os.rename('cropped_images/'+i+'/'+ valName,'cropped_images/val/'+i+'/'+ valName)  
+        for testName in test_data:
+            os.rename('cropped_images/'+i+'/'+ testName,'cropped_images/test/'+i+'/'+ testName)   
+        try:
+            os.rmdir('cropped_images/'+i)
+        except IOError as e:
+            print("not empty dir")
 # %%
-validation_split = 0.7
+
 train_data = tf.keras.preprocessing.image_dataset_from_directory(
-    directory=root,
+    directory=root+"/train",
     labels='inferred',
     label_mode='int',
     color_mode='rgb',
-    validation_split=validation_split,
-    subset='training',
+
     seed=6
 )
 
 validate_data = tf.keras.preprocessing.image_dataset_from_directory(
-    directory=root,
+    directory=root +"/val",
     labels='inferred',
     label_mode='int',
     color_mode='rgb',
-    validation_split=validation_split,
-    subset='validation',
+   
     seed=6
 )
 # %%
@@ -197,3 +223,5 @@ Epoch 9/10
 Epoch 10/10
 6946/6946 [==============================] - 606s 87ms/step - loss: 0.2351 - accuracy: 0.9230 - val_loss: 0.4458 - val_accuracy: 0.8749
 """
+
+# %%
