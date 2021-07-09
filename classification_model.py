@@ -8,6 +8,7 @@ from tensorflow.keras import layers
 from tensorflow.keras.models import Sequential
 from tensorflow.python.keras.layers.core import Dense, Dropout, Flatten
 from numpy import random
+import numpy as np
 # %%
 # loading the data
 chosen_labels = [
@@ -229,4 +230,38 @@ Epoch 10/10
 6946/6946 [==============================] - 606s 87ms/step - loss: 0.2351 - accuracy: 0.9230 - val_loss: 0.4458 - val_accuracy: 0.8749
 """
 
+# %%
+model.save('saved_model/my_model')
+#%%
+new_model = tf.keras.models.load_model('saved_model/my_model')
+new_model.summary()
+
+# %%
+#testing a bike
+object = {
+    0:   'bike',
+    1:   'motorcycle',
+    2:   'bus',
+    3:   'truck',
+    4:   'car',
+    5:   'train',
+    6:   'person',
+    7:   'traffic light',
+    8:   'stop sign',
+    9:   'fire hydrant',
+    10: 'background'
+    }
+img = keras.preprocessing.image.load_img(
+    '/home/ubuntu/tensorflow-street-classifier/cropped_images/test/0/1279.png', target_size=(256, 256)
+)
+img_array = keras.preprocessing.image.img_to_array(img)
+img_array = tf.expand_dims(img_array, 0) # Create a batch
+
+predictions = model.predict(img_array)
+score = tf.nn.softmax(predictions[0])
+
+print(
+    "This image most likely belongs to {} with a {:.2f} percent confidence."
+    .format(object[np.argmax(score)], 100 * np.max(score))
+)
 # %%

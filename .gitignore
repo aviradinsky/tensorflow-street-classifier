@@ -3,3 +3,4 @@ __pycache__/
 data/
 instances/
 cropped_images/
+saved_model/
