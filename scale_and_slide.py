@@ -42,6 +42,8 @@ def display_crops(img: Image.Image, crops: list,
     fig = plt.figure(figsize=figsize)
 
     for i in range(0, columns * rows):
+        if i >= len(crops):
+            break
         fig.add_subplot(rows, columns, i + 1)
         plt.imshow(crops[i])
         plt.axis('off')
