@@ -1,4 +1,4 @@
 A repo containing the ML project of YU Students.
 Using the coco dataset we developed a model to detect objects and identify commonly found on a street in a city.
-Nissim Cantor, Avi Radinsky, Jacob Silbiger
+by Nissim Cantor, Avi Radinsky, Jacob Silbiger
 Summer 2021
