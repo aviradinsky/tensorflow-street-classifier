@@ -205,7 +205,7 @@ model.compile(optimizer='adam',
                   from_logits=True),
               metrics=['accuracy'])
 # %%
-epochs = 1
+epochs = 15
 history = model.fit(
     train_data,
     validation_data=validate_data,
