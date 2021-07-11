@@ -106,13 +106,14 @@ def sliding_window(image: Image.Image, window_dim: tuple, stride: int):
     Returns:
         list of PIL.Image.Image: the cropped images
     """
-    
-    if window_dim[0] > image.width or window_dim[1] > image.height:
-        raise ValueError('window dimension of ' + str(window_dim) + ' is \
-                         larger than image of size: ' + str(image.size))
 
     print('START WINDOW SLIDING')
     print('cropping im size:' + str(image.size))
+
+    if window_dim[0] > image.width or window_dim[1] > image.height:
+        print(f'Crop dimenstions of {window_dim} were bigger than image'
+                'size of {image.size}. Aborting crop.')
+        return []
 
     pictures = []
 
@@ -206,6 +207,10 @@ def test():
     for i in range(num_rescales):
         display_crops(rescaled_images[i], crops[i], window_dimensions, stride)
     
-test()
+
+# %%
+
+if __name__ == '__main__':
+    test()
 
 # %%
