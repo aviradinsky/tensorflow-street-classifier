@@ -244,10 +244,7 @@ test_data = tf.keras.preprocessing.image_dataset_from_directory(
     seed=7
 )
 test_loss, test_acc = model.evaluate(test_data, verbose=2)
-<<<<<<< HEAD
 print(f'{test_acc}')
-# %%
-=======
-print(f'{test_acc = }')
-# %%
->>>>>>> 671fa3fb81049121784dbf73211e93c36ac100f6
+#%%
+
+
