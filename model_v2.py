@@ -158,13 +158,13 @@ def set_data_in_directories() -> None:
 # %%
 set_data_in_directories()
 # %%
-image_size = (64,64)
+image_size = (64,64,3)
 train_data = tf.keras.preprocessing.image_dataset_from_directory(
     directory=f'{directory}/train',
     labels='inferred',
     label_mode='int',
     color_mode='rgb',
-    image_size=image_size,
+    image_size=image_size[0:2],
     shuffle=True,
     subset='training',
     validation_split=0.2,
@@ -175,7 +175,7 @@ validate_data = tf.keras.preprocessing.image_dataset_from_directory(
     labels='inferred',
     label_mode='int',
     color_mode='rgb',
-    image_size=image_size,
+    image_size=image_size[0:2],
     shuffle=True,
     subset='validation',
     validation_split=0.2,
@@ -187,7 +187,7 @@ data_augmentation = Sequential([
     layers.experimental.preprocessing.RandomFlip('horizontal')
 ])
 model = Sequential([
-    layers.experimental.preprocessing.Rescaling(1./255, input_shape=(64,64,3)),
+    layers.experimental.preprocessing.Rescaling(1./255, input_shape=image_size),
     data_augmentation,
     layers.Conv2D(16, 3, padding='same', activation='relu'),
     layers.MaxPooling2D(),
@@ -205,7 +205,7 @@ model.compile(optimizer='adam',
                   from_logits=True),
               metrics=['accuracy'])
 # %%
-epochs = 6
+epochs = 1
 history = model.fit(
     train_data,
     validation_data=validate_data,
@@ -239,7 +239,7 @@ test_data = tf.keras.preprocessing.image_dataset_from_directory(
     labels='inferred',
     label_mode='int',
     color_mode='rgb',
-    image_size=image_size,
+    image_size=image_size[:2],
     shuffle=True,
     seed=7
 )
