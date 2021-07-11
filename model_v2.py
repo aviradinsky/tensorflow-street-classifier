@@ -147,7 +147,7 @@ def set_data_in_directories() -> None:
             after this line is code for houskeeping things
             """
             if count > track:
-                print(f'{count = }')
+                print(f'{count}')
                 track += 1000
             """
             if count > 100000:
@@ -244,5 +244,5 @@ test_data = tf.keras.preprocessing.image_dataset_from_directory(
     seed=7
 )
 test_loss, test_acc = model.evaluate(test_data, verbose=2)
-print(f'{test_acc = }')
+print(f'{test_acc}')
 # %%
