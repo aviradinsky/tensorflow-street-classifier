@@ -1,8 +1,6 @@
 # %%
-from re import S
 import tensorflow as tf
-from tensorflow.python.ops.math_ops import count_nonzero
-import tensorflow_datasets
+import tensorflow_datasets as tfds
 import os
 # %%
 """
@@ -55,18 +53,24 @@ def crop_tensor_by_nth_bbox(tensor, nth_bbox):
                                                     )
     pass
 
-def slice(image) -> list:
+def slice_into_4ths(image) -> list:
     x,y,z = image.shape
-    half = int(x / 2)
 
-    a = half - 3
-    b = half + 3
-    first_half = tf.slice(image, [0, 0, 0], [a, y, z])
-    second_half = tf.slice(image, [a, 0, 0], [b, y, z])
-    return [first_half,second_half]
+    x,y = int(x/2),int(y/2)
 
-def slice_into_4ths(image):
-    return slice(slice(image)[0]) + slice(slice(image)[1])
+    top_left = tf.slice(image, [0, 0, 0], [x, y, 3])
+    bottom_left = tf.slice(image, [x, 0, 0], [x, y, 3])
+    top_right = tf.slice(image, [0, y, 0], [x, y, 3])
+    bottom_right = tf.slice(image, [x, y, 0], [x, y, 3])
+
+    return [
+        top_right,
+        top_left,
+        bottom_left,
+        bottom_right
+    ]
+
+
 
 def get_image_manipulations_and_path(image,count) -> list:
     tensor = image
@@ -125,7 +129,7 @@ def set_data_in_directories() -> None:
     valid_keys = ('train','validation')
     count = 0
     for key in valid_keys:
-        for image in tensorflow_datasets.load('coco',shuffle_files=True).get(key):
+        for image in tfds.load('coco',shuffle_files=True).get(key):
             data = get_image_manipulations_and_path(image,count)
 
             for manipulation, path in data[0]:
@@ -133,4 +137,16 @@ def set_data_in_directories() -> None:
                 count = data[1] 
     pass
 # %%
+image = tfds.load('coco').get('train').take(1)
+import matplotlib.pyplot as plt
+for j in image:
+    j = j.get('image')
+    for i in slice_into_4ths(j):
+        plt.figure()
+        plt.imshow(i)
+        plt.show()
+# %%
+
 set_data_in_directories()
+
+# %%
