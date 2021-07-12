@@ -52,7 +52,7 @@ def get_resized(count, increment, img) :
 
 img = Image.open('test.jpg')
 num_images = 5
-percentage_increase = .4
+percentage_increase = 1.1
 images = get_resized(num_images, percentage_increase, img)
 
 ## uncomment to save the images, you'll be able to see the size difference
@@ -69,17 +69,18 @@ for i in range(num_images) :
 
 print()
 
-# # display all the images (you can't see the size difference in pyplot, but image size is printed above each image)
-# fig = plt.figure(figsize=(10,10))
-# rows = 3
-# columns = 3
+# display all the images (you can't see the size difference in pyplot, but image size is printed above each image)
+fig = plt.figure()
+rows = 3
+columns = 3
 
-# for i in range(num_images) :
-#     fig.add_subplot(rows, columns, i + 1)
-#     plt.imshow(images[i])
-#     plt.axis('off')
-#     plt.title(str(images[i].size))
-
-# fig.show()
+for i in range(num_images) :
+    
+    fig.add_subplot(rows, columns, i + 1)
+    plt.imshow(images[i])
+    plt.axis('off')
+    plt.title(str(images[i].size))
+    
+fig.show()
 
 # %%
