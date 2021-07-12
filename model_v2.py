@@ -1,10 +1,13 @@
 # %%
+from collections import defaultdict
 import tensorflow as tf
 import tensorflow_datasets as tfds
 import matplotlib.pyplot as plt
 import os
 from tensorflow.keras import layers
 from tensorflow.keras.models import Sequential
+from PIL import Image
+
 # %%
 """
 global variables
@@ -48,7 +51,7 @@ def crop_tensor_by_nth_bbox(tensor, nth_bbox):
     if target_height == 0 or target_width == 0 or top_line == 0 or right_line == 0:
         print('garbage is going in')
     """
-    if offset_height == 0 or offset_width == 0 or target_height == 0 or target_width == 0:
+    if offset_height == 0 or offset_width == 0 or target_height <= 10 or target_width <= 10:
         return None
     else:
         return tf.image.crop_to_bounding_box(image,
@@ -182,6 +185,35 @@ validate_data = tf.keras.preprocessing.image_dataset_from_directory(
     seed=6
 )
 # %%
+
+print(train_data)
+#object = defaultdict(int)
+object = {
+    0:   0,
+    1:   0,
+    2:   0,
+    3:   0,
+    4:   0,
+    5:   0,
+    6:   0,
+    7:   0,
+    8:   0,
+    9:   0,
+    10:  0
+    }
+for x in range(1,17): 
+    print(x)
+    plt.figure(figsize=(10, 10))
+    for images, labels in train_data.take(1):
+        for i in range(32):
+            object[int(labels[i])]+=1
+            ax = plt.subplot(6, 6, i + 1)
+            plt.imshow(images[i].numpy().astype("uint8"))
+            plt.title(int(labels[i]))
+            plt.axis("off")
+print(object)            
+
+# %%
 num_classes = len(chosen_labels) + 1 # for the background
 data_augmentation = Sequential([
     layers.experimental.preprocessing.RandomFlip('horizontal')
@@ -205,7 +237,7 @@ model.compile(optimizer='adam',
                   from_logits=True),
               metrics=['accuracy'])
 # %%
-epochs = 15
+epochs = 1
 history = model.fit(
     train_data,
     validation_data=validate_data,
