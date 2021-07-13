@@ -188,30 +188,19 @@ validate_data = tf.keras.preprocessing.image_dataset_from_directory(
 
 print(train_data)
 #object = defaultdict(int)
-object = {
-    0:   0,
-    1:   0,
-    2:   0,
-    3:   0,
-    4:   0,
-    5:   0,
-    6:   0,
-    7:   0,
-    8:   0,
-    9:   0,
-    10:  0
-    }
-for x in range(1,17): 
+object = os.listdir(os.getcwd()+"/data/train")
+object.sort()
+for x in range(1,2): 
     print(x)
     plt.figure(figsize=(10, 10))
     for images, labels in train_data.take(1):
         for i in range(32):
-            object[int(labels[i])]+=1
+            #object[int(labels[i])]+=1
             ax = plt.subplot(6, 6, i + 1)
             plt.imshow(images[i].numpy().astype("uint8"))
-            plt.title(int(labels[i]))
+            plt.title(object[int(labels[i])])
             plt.axis("off")
-print(object)            
+#print(object)            
 
 # %%
 num_classes = len(chosen_labels) + 1 # for the background
@@ -237,7 +226,7 @@ model.compile(optimizer='adam',
                   from_logits=True),
               metrics=['accuracy'])
 # %%
-epochs = 1
+epochs = 10
 history = model.fit(
     train_data,
     validation_data=validate_data,
@@ -278,5 +267,4 @@ test_data = tf.keras.preprocessing.image_dataset_from_directory(
 test_loss, test_acc = model.evaluate(test_data, verbose=2)
 print(f'{test_acc}')
 #%%
-
 

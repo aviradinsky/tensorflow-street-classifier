@@ -27,16 +27,16 @@ classes = {
 
 # %%
 # load model
-new_model = tf.keras.models.load_model('saved_model/my_model')
+new_model = tf.keras.models.load_model('model')
 new_model.summary()
 
 # %%
 
 test_subdir = '0' # pictures of buses
-imgs_dir = f'{os.getcwd()}/cropped_images/test/{test_subdir}/'
+imgs_dir = f'{os.getcwd()}/data/test/{test_subdir}/'
 window_size = (50, 50)
 stride = 40
-input_shape = (256, 256)
+input_shape = (64, 64)
 
 # %%
     
