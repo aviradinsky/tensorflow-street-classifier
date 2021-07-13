@@ -47,7 +47,6 @@ png_files = os.listdir(imgs_dir)
 
 for i, filename in enumerate(png_files):
     print(filename)
-    sys.exit()
     # remove breakpoint to contiue through all pics in directory
     if i == 1: 
         break
