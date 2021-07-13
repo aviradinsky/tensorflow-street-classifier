@@ -12,23 +12,34 @@ import numpy as np
 # %%
 # loading the data
 chosen_labels = [
-    1,  # bike
-    3,  # motorcycle
-    5,  # bus
-    7,  # truck
-    2,  # car
-    6,  # train
-    0,  # person
-    9,  # traffic light
-    11,  # stop sign
-    10  # fire hydrant
+    0,   # 'bike',
+    1,   # 'motorcycle',
+    2,   # 'bus',
+    3,   # 'truck',
+    4,   # 'car',
+    5,   # 'train',
+    6,   # 'person',
+    7,   # 'traffic light',
+    8,   # 'stop sign',
+    9,   # 'fire hydrant',
+    # 10  # 'background'
 ]
+
+# %%
+
+root = f'{os.getcwd()}/debugging/train'
+
+for directory in os.listdir(root):
+    print(directory)
+    print(len(os.listdir(root + '/' + directory)))
+
 # %%
 # check if directories exist
 # if directories exist it assumes that all data is downloaded and the code begins running the model stuff
 no_images = True
-root = f'{os.getcwd()}/cropped_images'
-for i in range(len(chosen_labels) + 1):
+root = f'{os.getcwd()}/debugging'
+# for i in range(len(chosen_labels) + 1):
+for i in range(len(chosen_labels)):
     if os.path.exists(f'{root}/test') and os.path.exists(f'{root}/val') and os.path.exists(f'{root}/train'):
         no_images = False
         break
@@ -131,7 +142,6 @@ train_data = tf.keras.preprocessing.image_dataset_from_directory(
     labels='inferred',
     label_mode='int',
     color_mode='rgb',
-
     seed=6
 )
 
@@ -140,11 +150,60 @@ validate_data = tf.keras.preprocessing.image_dataset_from_directory(
     labels='inferred',
     label_mode='int',
     color_mode='rgb',
-   
     seed=6
 )
+
 # %%
-num_classes = len(chosen_labels) + 1 # for the background
+
+print(train_data)
+#object = defaultdict(int)
+object = {
+    0:   0, # bike
+    1:   0,
+    2:   0, # airplane
+    3:   0, # bus
+    4:   0,
+    5:   0, # car
+    6:   0,
+    7:   0, # person
+    8:   0,
+    9:   0, # stop sign
+    10:  0
+    }
+# for x in range(1,17): 
+#     print(x)
+#     plt.figure(figsize=(10, 10))
+#     for images, labels in train_data.take(1):
+#         for i in range(32):
+#             object[int(labels[i])]+=1
+#             ax = plt.subplot(6, 6, i + 1)
+#             plt.imshow(images[i].numpy().astype("uint8"))
+#             plt.title(int(labels[i]))
+#             plt.axis("off")
+# print(object)
+
+
+# %%
+
+iter_ds = train_data.as_numpy_iterator()
+
+for x, i in enumerate(train_data):
+    # print(type(i), len(i), type(i[0]), type(i[1]))
+    print(i[1])
+    print(x)
+    if x == 30:
+        break
+
+
+# %%
+num_classes = len(chosen_labels) # for the background
+
+
+# %%
+print(num_classes)
+
+# %%
+
 data_augmentation = Sequential([
     layers.experimental.preprocessing.RandomFlip('horizontal')
 ])
@@ -168,14 +227,14 @@ model = Sequential([
     layers.Dense(num_classes)
 ])
 # %%
-model.summary
+model.summary()
 # %%
 model.compile(optimizer='adam',
               loss=tf.keras.losses.SparseCategoricalCrossentropy(
                   from_logits=True),
               metrics=['accuracy'])
 # %%
-epochs = 6
+epochs = 10
 history = model.fit(
     train_data,
     validation_data=validate_data,
@@ -203,32 +262,32 @@ plt.plot(epochs_range, val_loss, label='Validation Loss')
 plt.legend(loc='upper right')
 plt.title('Training and Validation Loss')
 plt.show()
-"""
-Found 246943 files belonging to 10 classes.
-Using 222249 files for training.
-Found 246943 files belonging to 10 classes.
-Using 24694 files for validation.
-Epoch 1/10
-6946/6946 [==============================] - 895s 107ms/step - loss: 0.6827 - accuracy: 0.7991 - val_loss: 0.4739 - val_accuracy: 0.8518
-Epoch 2/10
-6946/6946 [==============================] - 638s 92ms/step - loss: 0.4361 - accuracy: 0.8623 - val_loss: 0.4173 - val_accuracy: 0.8685
-Epoch 3/10
-6946/6946 [==============================] - 602s 87ms/step - loss: 0.3788 - accuracy: 0.8803 - val_loss: 0.4230 - val_accuracy: 0.8701
-Epoch 4/10
-6946/6946 [==============================] - 602s 87ms/step - loss: 0.3427 - accuracy: 0.8901 - val_loss: 0.4407 - val_accuracy: 0.8681
-Epoch 5/10
-6946/6946 [==============================] - 605s 87ms/step - loss: 0.3161 - accuracy: 0.8986 - val_loss: 0.4199 - val_accuracy: 0.8732
-Epoch 6/10
-6946/6946 [==============================] - 601s 87ms/step - loss: 0.2962 - accuracy: 0.9032 - val_loss: 0.4259 - val_accuracy: 0.8750
-Epoch 7/10
-6946/6946 [==============================] - 601s 87ms/step - loss: 0.2769 - accuracy: 0.9099 - val_loss: 0.4270 - val_accuracy: 0.8756
-Epoch 8/10
-6946/6946 [==============================] - 601s 87ms/step - loss: 0.2628 - accuracy: 0.9140 - val_loss: 0.4574 - val_accuracy: 0.8770
-Epoch 9/10
-6946/6946 [==============================] - 601s 86ms/step - loss: 0.2509 - accuracy: 0.9179 - val_loss: 0.4569 - val_accuracy: 0.8708
-Epoch 10/10
-6946/6946 [==============================] - 606s 87ms/step - loss: 0.2351 - accuracy: 0.9230 - val_loss: 0.4458 - val_accuracy: 0.8749
-"""
+# """
+# Found 246943 files belonging to 10 classes.
+# Using 222249 files for training.
+# Found 246943 files belonging to 10 classes.
+# Using 24694 files for validation.
+# Epoch 1/10
+# 6946/6946 [==============================] - 895s 107ms/step - loss: 0.6827 - accuracy: 0.7991 - val_loss: 0.4739 - val_accuracy: 0.8518
+# Epoch 2/10
+# 6946/6946 [==============================] - 638s 92ms/step - loss: 0.4361 - accuracy: 0.8623 - val_loss: 0.4173 - val_accuracy: 0.8685
+# Epoch 3/10
+# 6946/6946 [==============================] - 602s 87ms/step - loss: 0.3788 - accuracy: 0.8803 - val_loss: 0.4230 - val_accuracy: 0.8701
+# Epoch 4/10
+# 6946/6946 [==============================] - 602s 87ms/step - loss: 0.3427 - accuracy: 0.8901 - val_loss: 0.4407 - val_accuracy: 0.8681
+# Epoch 5/10
+# 6946/6946 [==============================] - 605s 87ms/step - loss: 0.3161 - accuracy: 0.8986 - val_loss: 0.4199 - val_accuracy: 0.8732
+# Epoch 6/10
+# 6946/6946 [==============================] - 601s 87ms/step - loss: 0.2962 - accuracy: 0.9032 - val_loss: 0.4259 - val_accuracy: 0.8750
+# Epoch 7/10
+# 6946/6946 [==============================] - 601s 87ms/step - loss: 0.2769 - accuracy: 0.9099 - val_loss: 0.4270 - val_accuracy: 0.8756
+# Epoch 8/10
+# 6946/6946 [==============================] - 601s 87ms/step - loss: 0.2628 - accuracy: 0.9140 - val_loss: 0.4574 - val_accuracy: 0.8770
+# Epoch 9/10
+# 6946/6946 [==============================] - 601s 86ms/step - loss: 0.2509 - accuracy: 0.9179 - val_loss: 0.4569 - val_accuracy: 0.8708
+# Epoch 10/10
+# 6946/6946 [==============================] - 606s 87ms/step - loss: 0.2351 - accuracy: 0.9230 - val_loss: 0.4458 - val_accuracy: 0.8749
+# """
 
 # %%
 model.save('saved_model/my_model')
