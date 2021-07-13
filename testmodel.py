@@ -56,6 +56,7 @@ crops_set = scale_and_slide.sliding_window(img, window_dimensions, stride)
 #rescaled_images = scale_and_slide.get_scaled_images(img, num_rescales, rescale_increment)
 scale_and_slide.simple_display_image(img)
 # %%
+
 for i in crops_set:
     
     #scale_and_slide.display_crops(rescaled_images[i], crops[i], window_dimensions, stride)
@@ -67,12 +68,13 @@ for i in crops_set:
     obj= tf.keras.preprocessing.image.img_to_array(i)
     obj = tf.expand_dims(obj, 0) # Create a batch
     predictions = model.predict(obj)
-
-
+    print(predictions.shape)
+    print(predictions)
    
     score = tf.nn.softmax(predictions[0])
+    print(score)
     plt.imshow(i)
-    plt.title((" {} with {:.2f} percent confidence.".format(object[np.argmax(score)], 100 * np.max(score))))
+    plt.title((" {} with {:.2f} percent confidence.".format(np.argmax(score), 100 * np.max(score))))
     plt.show()
     
 # %%

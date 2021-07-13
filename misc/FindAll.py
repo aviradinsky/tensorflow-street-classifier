@@ -83,11 +83,11 @@ def myprint(d):
 #%%
 ds, info = tfds.load('coco', split='train', with_info=True)
 ds = tfds.as_numpy(ds)
-file = open(r"/home/ubuntu/tensorflow_datasets/coco/2014/1.1.0/objects-label.labels.txt")
+file = open(r"C:\Users\jakes\tensorflow_datasets\coco\2014\1.1.0\objects-label.labels.txt")
 word = file.readlines()
 #print(word)
 lines = []
-image_bytes = open("image_bytes.txt", "wb")
+image_bytes = open("writeData.json", "w")
 for obj in objects:
     #print(obj)
     for count, value in enumerate(word):
@@ -96,12 +96,13 @@ for obj in objects:
 
 
 #%%
-os.mkdir('data')
+#os.mkdir('data')
 x = 0
 image_count = 0
 # remove breakpoint to continue though whole dataset
 for example in ds:  # (image[], labels[], objects[], bbox[])
-    if x == 15:
+    print(example.items())
+    if x == 7:
         break
     print(example['image'].shape)
     image = example['image']
@@ -111,7 +112,7 @@ for example in ds:  # (image[], labels[], objects[], bbox[])
     #print(labels)
     # print(bboxes)  # [y_min, x_min, y_max, x_max]
     if (set(lines) & set(labels)):
-        myprint(example)      
+        json.dump(example, image_bytes)    
     x += 1
 
 
