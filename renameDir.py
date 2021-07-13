@@ -1,13 +1,5 @@
 # %%
-
 import os
-
-
-
-
-
-# %%
-#testing a bike
 object = {
     0:   'bicycle',
     1:   'motorcycle',
