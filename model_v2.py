@@ -1,14 +1,11 @@
 # %%
 import tensorflow as tf
-import matplotlib.pyplot as plt
 from tensorflow.keras import layers
 from tensorflow.keras.models import Sequential
-import tensorflow as tf
 import matplotlib.pyplot as plt
 import load_data
 import os
 # %%
-directory = os.getcwd()
 chosen_labels = [
     'bicycle',
     'motorcycle',
@@ -26,13 +23,13 @@ chosen_labels = [
 this loads all of the data from the tfds into folders
 """
 load_data.main(
-    directory=directory,
+    directory=os.getcwd(),
     chosen_labels_string=chosen_labels
 )
 # %%
-directory = f'{directory}/data'
+directory = f'{os.getcwd()}/data'
 
-image_size = (64,64,3)
+image_size = (100,100,3)
 train_data = tf.keras.preprocessing.image_dataset_from_directory(
     directory=f'{directory}/train',
     labels='inferred',
@@ -79,7 +76,7 @@ model.compile(optimizer='adam',
                   from_logits=True),
               metrics=['accuracy'])
 # %%
-epochs = 10
+epochs = 7
 history = model.fit(
     train_data,
     validation_data=validate_data,
@@ -118,6 +115,6 @@ test_data = tf.keras.preprocessing.image_dataset_from_directory(
     seed=7
 )
 test_loss, test_acc = model.evaluate(test_data, verbose=2)
-print(f'{test_acc}')
+print(f'test_acc = {test_acc}')
 #%%
 

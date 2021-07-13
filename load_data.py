@@ -120,13 +120,13 @@ def main(
                     images_to_send.append((crop_tensor_by_nth_bbox(data,i),all_possible_labels[int_label]))
 
             if len(images_to_send) == 0:
-                images_to_send = slice_into_4ths(image)
+                images_to_send.append((image,'background'))
 
-            for i in images_to_send:
-                image = i[0]
+            for send in images_to_send:
+                image = send[0]
                 if image is None:
                     continue
-                label = i[1].replace(' ','_')
+                label = send[1].replace(' ','_')
                 if number_of_images_so_far % 8 == 0:
                     label = f'test/{label}'
                 else:
@@ -135,4 +135,5 @@ def main(
                 number_of_images_so_far += 1
                 if number_of_images_so_far % 1000 == 0:
                     print(f'{number_of_images_so_far = }')
+main()
 # %%
