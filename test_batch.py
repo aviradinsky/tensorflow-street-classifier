@@ -6,6 +6,7 @@ import tensorflow as tf
 import numpy as np
 import cv2 as cv
 import os
+import sys
 
 import scale_and_slide as sas
 
@@ -22,7 +23,7 @@ classes = {
     7:   'traffic light',
     8:   'stop sign',
     9:   'fire hydrant',
-    10: 'background'
+    # 10: 'background'
 }
 
 # %%
@@ -32,8 +33,13 @@ new_model.summary()
 
 # %%
 
+<<<<<<< HEAD
 test_subdir = '0' # pictures of buses
 imgs_dir = f'{os.getcwd()}/data/test/{test_subdir}/'
+=======
+test_subdir = '5'
+imgs_dir = f'{os.getcwd()}/debugging/train/{test_subdir}/'
+>>>>>>> fc1bb93cea8de546858264cc7ffecea24e807049
 window_size = (50, 50)
 stride = 40
 input_shape = (64, 64)
@@ -45,6 +51,7 @@ resized_crops = []
 png_files = os.listdir(imgs_dir)
 
 for i, filename in enumerate(png_files):
+    print(filename)
     # remove breakpoint to contiue through all pics in directory
     if i == 1: 
         break
@@ -91,14 +98,15 @@ paths_and_predictions = list(zip(png_files, predictions))
 
 for i, pair in enumerate(paths_and_predictions):
     # remove breakpoint to continue through entire predictions set
-    if i == 6:
+    if i == 15:
         break
     # check score of ith image in dir
     score = tf.nn.softmax(pair[1])
     plt.figure()
-    plt.title(f'model: this is a {classes[np.argmax(score)]}')
+    plt.title(f'model: this is a {classes[np.argmax(score)]}\n')
     plt.imshow(Image.open(imgs_dir + pair[0]))
     plt.show()
     print(f'score for test image {i}: {np.argmax(score)}')
+    print(score)
 
 # %%
