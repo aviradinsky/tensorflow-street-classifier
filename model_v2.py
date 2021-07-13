@@ -79,7 +79,7 @@ model.compile(optimizer='adam',
                   from_logits=True),
               metrics=['accuracy'])
 # %%
-epochs = 1
+epochs = 10
 history = model.fit(
     train_data,
     validation_data=validate_data,
@@ -120,5 +120,4 @@ test_data = tf.keras.preprocessing.image_dataset_from_directory(
 test_loss, test_acc = model.evaluate(test_data, verbose=2)
 print(f'{test_acc}')
 #%%
-
 
