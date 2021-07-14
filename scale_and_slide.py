@@ -157,7 +157,8 @@ def sliding_window(image: Image.Image, window_dim: tuple, stride: int):
 #%%
 
 def get_image_chunks(img: Image.Image, window_dim: tuple, stride: int, 
-                     num_rescales=3, rescale_increment=.5):
+                     num_rescales=3, rescale_increment=.5, 
+                     display_imgs=False):
     """Generates sub-images by resizing the image and running a sliding
     window across each of the resized images
     Args:
@@ -169,11 +170,10 @@ def get_image_chunks(img: Image.Image, window_dim: tuple, stride: int,
         rescale_increment (float, optional): fraction by which to 
                                  increase image after each resize
     Returns:
-        list: a nested list of lists of crop tuples. Each rescaled 
-        images has its own sublist, and inside of each sublist are 
-        tuples of length 2, where the array of the crop is stored at 
-        position [0] and its location in the original image is stored
-        at position [1]
+        list: a list tuples. Each frop is represented by a tuple of 
+        length 2, where the array of the crop is stored at position
+        [0] and its location in the original image is stored at 
+        position [1]
     """
 
     # first task - rescale the image into multiple sizes
@@ -190,7 +190,19 @@ def get_image_chunks(img: Image.Image, window_dim: tuple, stride: int,
         crops_as_arrays = [(np.array(x), y) for x, y in crops_set]
         crops.append(crops_as_arrays)
 
-    return crops
+    if display_imgs:
+
+        for i in range(num_rescales):
+            # extract only the images from (crop, location) tuples
+            crop_set = [x for x, y in crops[i]]
+            display_crops(scaled_images[i], crop_set, window_dim, stride)
+
+    simple_list = []
+
+    for a_set in crops:
+        simple_list += a_set
+
+    return simple_list
 
 # %%
 
@@ -199,22 +211,17 @@ def get_image_chunks(img: Image.Image, window_dim: tuple, stride: int,
 # ************************************
 def test():
     img = Image.open('cropped_images/train/1/173.png')
+    simple_display_image(img)
+
     window_dimensions = (75, 100)
     stride = 50
     num_rescales = 3
     rescale_increment = .5
 
+    # crops then displays images
     crops = get_image_chunks(img, window_dimensions, stride,
-                             num_rescales, rescale_increment)
-
-    rescaled_images = get_scaled_images(img, num_rescales, rescale_increment)
-    simple_display_image(img)
-
-    for i in range(num_rescales):
-        # extract only the images from (crop, location) tuples
-        crop_set = [x for x, y in crops[i]]
-        display_crops(rescaled_images[i], crop_set, window_dimensions, stride)
-    
+                             num_rescales, rescale_increment,
+                             display_imgs=True)
 
 # %%
 
