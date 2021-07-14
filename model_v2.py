@@ -3,6 +3,7 @@ import tensorflow as tf
 from tensorflow.keras import layers
 from tensorflow.keras.models import Sequential
 import matplotlib.pyplot as plt
+from tensorflow.python.keras.layers.core import Dropout
 import load_data
 import os
 # %%
@@ -18,6 +19,7 @@ chosen_labels = [
     'stop sign',
     'fire hydrant'
 ]
+image_size = (100,100,3)
 # %%
 """
 this loads all of the data from the tfds into folders
@@ -64,6 +66,11 @@ model = Sequential([
     layers.MaxPooling2D(),
     layers.Conv2D(32, 3, padding='same', activation='relu'),
     layers.MaxPooling2D(),
+    layers.Conv2D(64, 3, padding='same', activation='relu'),
+    layers.MaxPooling2D(),
+    layers.Conv2D(128, 3, padding='same', activation='relu'),
+    layers.MaxPooling2D(),
+    layers.Dropout(0.2),
     layers.Flatten(),
     layers.Dense(32, activation='relu'),
     layers.Dense(num_classes)
@@ -76,7 +83,7 @@ model.compile(optimizer='adam',
                   from_logits=True),
               metrics=['accuracy'])
 # %%
-epochs = 7
+epochs = 15
 history = model.fit(
     train_data,
     validation_data=validate_data,

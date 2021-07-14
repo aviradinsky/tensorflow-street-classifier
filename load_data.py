@@ -52,7 +52,6 @@ def slice_into_4ths(image) -> list:
 # %%
 lines = open('misc/objects-label.labels.txt','r').readlines()
 all_possible_labels = [line.strip() for line in lines]
-
 def main(
     directory = f'{os.getcwd()}',
     chosen_labels_string = [
@@ -85,13 +84,17 @@ def main(
     if dont_need_to_continue:
         print('Directory structure for data, detected\nno longer creating data')
         return
-    
+    count_of_labels_dict = {}
+
     for string in chosen_labels_string:
         s = string.replace(' ', '_')
+        count_of_labels_dict[s] = 0
         os.makedirs(f'{directory}/test/{s}/')
         os.makedirs(f'{directory}/train/{s}/')
     os.makedirs(f'{directory}/test/background/')
     os.makedirs(f'{directory}/train/background/')
+    count_of_labels_dict['background'] = 0
+    print(count_of_labels_dict)
     
 
     total_labels = len(chosen_labels_string) + 1
@@ -127,6 +130,10 @@ def main(
                 if image is None:
                     continue
                 label = send[1].replace(' ','_')
+                if count_of_labels_dict[label] > 2000:
+                    continue
+                else:
+                    count_of_labels_dict[label] += 1
                 if number_of_images_so_far % 8 == 0:
                     label = f'test/{label}'
                 else:
@@ -135,5 +142,7 @@ def main(
                 number_of_images_so_far += 1
                 if number_of_images_so_far % 1000 == 0:
                     print(f'{number_of_images_so_far = }')
+# %%
 main()
+
 # %%

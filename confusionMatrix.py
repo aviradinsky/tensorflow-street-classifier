@@ -3,15 +3,12 @@ import tensorflow as tf
 import tensorflow_datasets as tfds
 import matplotlib.pyplot as plt
 import os
-from tensorflow.keras import layers
-from tensorflow.keras.models import Sequential
-from PIL import Image
 import numpy as np
 import seaborn as sns
 #%%
 model = tf.keras.models.load_model('model')
 directory = f'{os.getcwd()}/data/'
-image_size = (64,64,3)
+image_size = (100,100,3)
 test_data = tf.keras.preprocessing.image_dataset_from_directory(
     directory=f'{directory}/test',
     labels='inferred',
@@ -26,7 +23,7 @@ test_images = []
 test_labels = []
 x=0
 for image, label in tfds.as_numpy(test_data):
-    print(x) #batch
+    #print(x) #batch
     test_images.append(image)
     test_labels.append(label)
     x+=1
@@ -37,7 +34,7 @@ for image, label in tfds.as_numpy(test_data):
 y_pred = []
 x=0
 for batch in test_images:
-    print(x)
+    #print(x)
     y_pred.append(np.argmax(model.predict(batch), axis=1)) #predict each item in batch
     x+=1
 y_true = test_labels
