@@ -15,7 +15,6 @@ def simple_display_image(img: Image.Image):
         img (PIL.Image.Image): image to display
     """
 
-    plt.figure()
     plt.imshow(img)
     plt.show()
 
@@ -85,7 +84,6 @@ def get_scaled_images(img: Image.Image, count=3, increment=.5):
     
     print('original image size: ', tuple(img.size))
     print('END IMAGE RESCALING \n')
-
     return imgs
 
 #%%
@@ -106,7 +104,9 @@ def sliding_window(image: Image.Image, window_dim: tuple, stride: int):
         ValueError: if window_dim is larger than image to crop
 
     Returns:
-        list of PIL.Image.Image: the cropped images
+        list of (PIL.Image.Image, tuple) tuples: a list of tuples of 
+        length 2, where the crop is stored at position [0] and its
+        bounds are stored at position [1]
     """
 
     print('START WINDOW SLIDING')
@@ -139,10 +139,10 @@ def sliding_window(image: Image.Image, window_dim: tuple, stride: int):
                 left_bound = image.width - window_dim[0]
                 right_bound = image.width
             
-            crop_bounds = [left_bound, upper_bound, right_bound, lower_bound]
+            crop_bounds = (left_bound, upper_bound, right_bound, lower_bound)
 
             crop = image.crop(crop_bounds)
-            pict = [crop, crop_bounds]
+            pict = (crop, crop_bounds)
             pictures.append(pict)
 
             if right_bound == image.width:
@@ -152,12 +152,12 @@ def sliding_window(image: Image.Image, window_dim: tuple, stride: int):
 
     print('END WINDOW SLIDING \n')
 
-    return [im for [im, dims] in pictures]
+    return pictures
 
 #%%
 
 def get_image_chunks(img: Image.Image, window_dim: tuple, stride: int, 
-                     num_rescales=3, rescale_increment=5):
+                     num_rescales=3, rescale_increment=.5):
     """Generates sub-images by resizing the image and running a sliding
     window across each of the resized images
     Args:
@@ -169,8 +169,11 @@ def get_image_chunks(img: Image.Image, window_dim: tuple, stride: int,
         rescale_increment (float, optional): fraction by which to 
                                  increase image after each resize
     Returns:
-        list: a nested list of lists of numpay.array of cropped images.
-        Each resized image is stored inside of its own list
+        list: a nested list of lists of crop tuples. Each rescaled 
+        images has its own sublist, and inside of each sublist are 
+        tuples of length 2, where the array of the crop is stored at 
+        position [0] and its location in the original image is stored
+        at position [1]
     """
 
     # first task - rescale the image into multiple sizes
@@ -181,10 +184,11 @@ def get_image_chunks(img: Image.Image, window_dim: tuple, stride: int,
     # rescaled images
     crops = []
     
+    # convert images to numpy arrays
     for im in scaled_images:
         crops_set = sliding_window(im, window_dim, stride)
-        as_arrays = [np.array(x) for x in crops_set]
-        crops.append(as_arrays)
+        crops_as_arrays = [(np.array(x), y) for x, y in crops_set]
+        crops.append(crops_as_arrays)
 
     return crops
 
@@ -194,20 +198,22 @@ def get_image_chunks(img: Image.Image, window_dim: tuple, stride: int,
 # SAMPLE TEST
 # ************************************
 def test():
-    img = Image.open('test.jpg')
+    img = Image.open('cropped_images/train/1/173.png')
     window_dimensions = (75, 100)
     stride = 50
     num_rescales = 3
     rescale_increment = .5
 
     crops = get_image_chunks(img, window_dimensions, stride,
-                            num_rescales, rescale_increment)
+                             num_rescales, rescale_increment)
 
     rescaled_images = get_scaled_images(img, num_rescales, rescale_increment)
     simple_display_image(img)
 
     for i in range(num_rescales):
-        display_crops(rescaled_images[i], crops[i], window_dimensions, stride)
+        # extract only the images from (crop, location) tuples
+        crop_set = [x for x, y in crops[i]]
+        display_crops(rescaled_images[i], crop_set, window_dimensions, stride)
     
 
 # %%
