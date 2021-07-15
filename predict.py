@@ -18,6 +18,7 @@ import os
 
 import scale_and_slide as sas
 import selective_search as ss
+import params
 
 # %%
 
@@ -220,7 +221,7 @@ def test():
     img_path = 'predict_img.jpg'
     test_image = Image.open(img_path)
 
-    model_path = 'saved_model/my_model'
+    model_path = params.model_dir
     crop_dims = (65,100)
     stride = 40
 
