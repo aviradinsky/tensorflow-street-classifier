@@ -159,13 +159,8 @@ def predict(model_path: str, image: Image.Image,
 
 def test():
     # get test image
-    home_dir = os.path.expanduser('~')
-    test_dir = f'{home_dir}/tensorflow_datasets/downloads/extracted'\
-            + '/ZIP.images.cocodataset.org_zips_test2015GiqolrgR'\
-            + 'QKhQp4-ov_B9RVaY0qvzZP8FchdjRYqBAco.zip/test2015'
-    im_name = 'COCO_test2015_000000113841.jpg'
-    full_path = test_dir + '/' + im_name
-    test_image = Image.open(full_path)
+    img_path = 'predict_img.jpg'
+    test_image = Image.open(img_path)
 
     model_path = 'saved_model/my_model'
     crop_dims = (65,100)
