@@ -1,167 +1,37 @@
 # %%
-from collections import defaultdict
 import tensorflow as tf
-import tensorflow_datasets as tfds
-import matplotlib.pyplot as plt
-import os
 from tensorflow.keras import layers
 from tensorflow.keras.models import Sequential
-from PIL import Image
-
+import matplotlib.pyplot as plt
+from tensorflow.python.keras.layers.core import Dropout
+import load_data
+import os
 # %%
-"""
-global variables
-"""
-directory = f'{os.getcwd()}/data/'
 chosen_labels = [
-    1,  # bike
-    3,  # motorcycle
-    5,  # bus
-    7,  # truck
-    2,  # car
-    6,  # train
-    0,  # person
-    9,  # traffic light
-    11,  # stop sign
-    10  # fire hydrant
+    'bicycle',
+    'motorcycle',
+    'bus',
+    'truck',
+    'car',
+    'train',
+    'person',
+    'traffic light',
+    'stop sign',
+    'fire hydrant'
 ]
+image_size = (100,100,3)
 # %%
-
-def crop_tensor_by_nth_bbox(tensor, nth_bbox):
-    """
-    given an image with bboxs this method returns the cropped image
-    for the nth bbox
-    """
-
-
-    bbox = tensor.get('objects').get('bbox').numpy()[nth_bbox]
-    image = tensor.get('image')
-
-    top_line = bbox[0]*image.shape[0]
-    left_line = bbox[1]*image.shape[1]
-    bottom_line = bbox[2]*image.shape[0]
-    right_line = bbox[3]*image.shape[1]
-
-    offset_height = int(top_line)
-    offset_width = int(left_line)
-    target_height = int(bottom_line - top_line)
-    target_width = int(right_line - left_line)
-
-    """
-    if target_height == 0 or target_width == 0 or top_line == 0 or right_line == 0:
-        print('garbage is going in')
-    """
-    if offset_height == 0 or offset_width == 0 or target_height <= 10 or target_width <= 10:
-        return None
-    else:
-        return tf.image.crop_to_bounding_box(image,
-                                                    offset_height=offset_height,
-                                                    offset_width=offset_width,
-                                                    target_height=target_height,
-                                                    target_width=target_width
-                                                    )
-
-def slice_into_4ths(image) -> list:
-    x,y,z = image.shape
-
-    x,y = int(x/2),int(y/2)
-
-    top_left = tf.slice(image, [0, 0, 0], [x, y, 3])
-    bottom_left = tf.slice(image, [x, 0, 0], [x, y, 3])
-    top_right = tf.slice(image, [0, y, 0], [x, y, 3])
-    bottom_right = tf.slice(image, [x, y, 0], [x, y, 3])
-
-    return [
-        top_right,
-        top_left,
-        bottom_left,
-        bottom_right
-    ]
-
-
-
-def get_image_manipulations_and_path(image,count) -> list:
-    tensor = image
-    objects = image.get('objects')
-    all_labels = objects.get('label').numpy()
-    image = image.get('image') 
-    ret = []
-    path_buffer: str= ''
-    if len(set(all_labels) & set(chosen_labels)) == 0:
-        """
-        this is background and will be randomly cropped to increase number
-        """
-        images = slice_into_4ths(image)
-        for i in images:
-            if count % 8 == 0:
-                path = f'{directory}/test/10/{count}.jpeg'
-            else:
-                path = f'{directory}/train/10/{count}.jpeg'
-            count += 1
-            ret.append((i,path))
-    else:
-        """
-        this is images that have objects we want, they will be cropped
-        """
-        for ind, label in enumerate(all_labels):
-            if label in chosen_labels:
-                image = crop_tensor_by_nth_bbox(tensor,ind)
-                if image is None:
-                    continue
-                if count % 8 == 0:
-                    path = f'{directory}/test/{chosen_labels.index(label)}/{count}.jpeg'
-                else:
-                    path = f'{directory}/train/{chosen_labels.index(label)}/{count}.jpeg'
-                count += 1
-                ret.append((image,path))
-    return (ret,count)
-
-
-def set_data_in_directories() -> None:
-    """
-    checking to see if the path ('data/' and 'data/test') exists, if it does no code will run
-    """
-
-    if os.path.exists(f'{directory}/train/0'):
-        # this means that the data was already loaded
-        print(f'Data is already in the data folders')
-        return
-    else:
-        for i in range(len(chosen_labels) + 1):
-            os.makedirs(f'{directory}/train/{i}')
-            os.makedirs(f'{directory}/test/{i}')
-    
-    """ 
-    there are 4 keys but test and test2015 dont have labels
-    """
-
-
-    valid_keys = ('train','validation')
-    count = 0
-    track = 0
-    for key in valid_keys:
-        for image in tfds.load('coco',shuffle_files=True).get(key):
-            data = get_image_manipulations_and_path(image,count)
-            count = data[1] 
-            for manipulation, path in data[0]:
-                tf.keras.preprocessing.image.save_img(path, manipulation)
-
-            """
-            after this line is code for houskeeping things
-            """
-            if count > track:
-                print(f'{count}')
-                track += 1000
-            """
-            if count > 100000:
-                print('done loading data into dirs')
-                return
-            """
-    pass
+"""
+this loads all of the data from the tfds into folders
+"""
+load_data.main(
+    directory=os.getcwd(),
+    chosen_labels_string=chosen_labels
+)
 # %%
-set_data_in_directories()
-# %%
-image_size = (64,64,3)
+directory = f'{os.getcwd()}/data'
+
+image_size = (100,100,3)
 train_data = tf.keras.preprocessing.image_dataset_from_directory(
     directory=f'{directory}/train',
     labels='inferred',
@@ -185,35 +55,6 @@ validate_data = tf.keras.preprocessing.image_dataset_from_directory(
     seed=6
 )
 # %%
-
-print(train_data)
-#object = defaultdict(int)
-object = {
-    0:   0,
-    1:   0,
-    2:   0,
-    3:   0,
-    4:   0,
-    5:   0,
-    6:   0,
-    7:   0,
-    8:   0,
-    9:   0,
-    10:  0
-    }
-for x in range(1,17): 
-    print(x)
-    plt.figure(figsize=(10, 10))
-    for images, labels in train_data.take(1):
-        for i in range(32):
-            object[int(labels[i])]+=1
-            ax = plt.subplot(6, 6, i + 1)
-            plt.imshow(images[i].numpy().astype("uint8"))
-            plt.title(int(labels[i]))
-            plt.axis("off")
-print(object)            
-
-# %%
 num_classes = len(chosen_labels) + 1 # for the background
 data_augmentation = Sequential([
     layers.experimental.preprocessing.RandomFlip('horizontal')
@@ -225,6 +66,11 @@ model = Sequential([
     layers.MaxPooling2D(),
     layers.Conv2D(32, 3, padding='same', activation='relu'),
     layers.MaxPooling2D(),
+    layers.Conv2D(64, 3, padding='same', activation='relu'),
+    layers.MaxPooling2D(),
+    layers.Conv2D(128, 3, padding='same', activation='relu'),
+    layers.MaxPooling2D(),
+    layers.Dropout(0.2),
     layers.Flatten(),
     layers.Dense(32, activation='relu'),
     layers.Dense(num_classes)
@@ -237,7 +83,7 @@ model.compile(optimizer='adam',
                   from_logits=True),
               metrics=['accuracy'])
 # %%
-epochs = 1
+epochs = 15
 history = model.fit(
     train_data,
     validation_data=validate_data,
@@ -276,7 +122,6 @@ test_data = tf.keras.preprocessing.image_dataset_from_directory(
     seed=7
 )
 test_loss, test_acc = model.evaluate(test_data, verbose=2)
-print(f'{test_acc}')
+print(f'test_acc = {test_acc}')
 #%%
-
 
