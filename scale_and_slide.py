@@ -3,6 +3,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import math
+import sys
 
 from PIL import Image
 
@@ -106,7 +107,9 @@ def sliding_window(image: Image.Image, window_dim: tuple, stride: int):
     Returns:
         list of (PIL.Image.Image, tuple) tuples: a list of tuples of 
         length 2, where the crop is stored at position [0] and its
-        bounds are stored at position [1]
+        bounds are stored in a four-tuple at position [1]. The order
+        of the tuple is as follows:
+                (left_bound, upper_bound, right_bound, lower_bound)
     """
 
     print('START WINDOW SLIDING')
@@ -173,7 +176,8 @@ def get_image_chunks(img: Image.Image, window_dim: tuple, stride: int,
         list: a list tuples. Each frop is represented by a tuple of 
         length 2, where the array of the crop is stored at position
         [0] and its location in the original image is stored at 
-        position [1]
+        position [1].  The order of the tuple is as follows:
+            (left_bound, upper_bound, right_bound, lower_bound)
     """
 
     # first task - rescale the image into multiple sizes
@@ -185,10 +189,21 @@ def get_image_chunks(img: Image.Image, window_dim: tuple, stride: int,
     crops = []
     
     # convert images to numpy arrays
-    for im in scaled_images:
+    for i, im in enumerate(scaled_images):
+        scale = rescale_increment ** (len(scaled_images) - 1 - i)
         crops_set = sliding_window(im, window_dim, stride)
-        crops_as_arrays = [(np.array(x), y) for x, y in crops_set]
+        crops_as_arrays = [(np.array(x), (int(y[0] * scale), int(y[1] * scale), 
+                                          int(y[2] * scale), int(y[3] * scale)
+                                          )
+                            ) 
+                            for x, y in crops_set
+                          ]
         crops.append(crops_as_arrays)
+
+    # for crop_list in crops:
+    #     print('\n*********starting new list*********\n')
+    #     for tup in crop_list:
+    #         print((tup[1][2] - tup[1][0], tup[1][3] - tup[1][1]))
 
     if display_imgs:
 
@@ -201,6 +216,12 @@ def get_image_chunks(img: Image.Image, window_dim: tuple, stride: int,
 
     for a_set in crops:
         simple_list += a_set
+
+    # for tup in simple_list:
+    #     print(tup[1])
+        # print((tup[1][0] + tup[1][2], tup[1][1] + tup[1][3]))
+    # print(type(simple_list[0][0]), type(simple_list[0][1]))
+    # sys.exit()
 
     return simple_list
 
@@ -221,7 +242,8 @@ def test():
     # crops then displays images
     crops = get_image_chunks(img, window_dimensions, stride,
                              num_rescales, rescale_increment,
-                             display_imgs=True)
+                             display_imgs=True
+                            )
 
 # %%
 
