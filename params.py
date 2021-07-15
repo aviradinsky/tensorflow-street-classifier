@@ -11,3 +11,4 @@ chosen_labels = [
     'fire hydrant'
 ]
 image_size = (100,100,3)
+model_dir = 'model'
