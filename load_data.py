@@ -130,11 +130,11 @@ def main(
                 if image is None:
                     continue
                 label = send[1].replace(' ','_')
-                if count_of_labels_dict[label] > 2000:
+                if count_of_labels_dict[label] > 5000:
                     continue
                 else:
                     count_of_labels_dict[label] += 1
-                if number_of_images_so_far % 8 == 0:
+                if count_of_labels_dict[label] % 8 == 0:
                     label = f'test/{label}'
                 else:
                     label = f'train/{label}'
@@ -144,5 +144,3 @@ def main(
                     print(f'{number_of_images_so_far = }')
 # %%
 main()
-
-# %%
