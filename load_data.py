@@ -1,6 +1,7 @@
 # %%
 import matplotlib.pyplot as plt
 import tensorflow as tf
+from tensorflow.python.keras.backend import convert_inputs_if_ragged
 import tensorflow_datasets as tfds
 import os
 # %%
@@ -44,10 +45,10 @@ def slice_into_4ths(image) -> list:
     bottom_right = tf.slice(image, [x, y, 0], [x, y, 3])
 
     return [
-        (top_right,'background'),
-        (top_left,'background'),
-        (bottom_left,'background'),
-        (bottom_right,'background'),
+        top_right,
+        top_left,
+        bottom_left,
+        bottom_right,
     ]
 # %%
 lines = open('misc/objects-label.labels.txt','r').readlines()
@@ -121,9 +122,9 @@ def main(
             for i,int_label in enumerate(number_form_labels):
                 if int_label in chosen_labels_int:
                     images_to_send.append((crop_tensor_by_nth_bbox(data,i),all_possible_labels[int_label]))
-
             if len(images_to_send) == 0:
-                images_to_send.append((image,'background'))
+                for fourth in slice_into_4ths(image):
+                    images_to_send.append((fourth,'background'))
 
             for send in images_to_send:
                 image = send[0]
@@ -133,7 +134,10 @@ def main(
                 if count_of_labels_dict[label] > 5000:
                     continue
                 else:
-                    count_of_labels_dict[label] += 1
+                    if label == 'background':
+                        count_of_labels_dict[label] += 0.25
+                    else:
+                        count_of_labels_dict[label] += 1
                 if count_of_labels_dict[label] % 8 == 0:
                     label = f'test/{label}'
                 else:
@@ -144,3 +148,4 @@ def main(
                     print(f'{number_of_images_so_far}')
 # %%
 main()
+# %%
