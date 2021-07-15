@@ -6,20 +6,8 @@ import matplotlib.pyplot as plt
 from tensorflow.python.keras.layers.core import Dropout
 import load_data
 import os
+from params import chosen_labels, image_size
 # %%
-chosen_labels = [
-    'bicycle',
-    'motorcycle',
-    'bus',
-    'truck',
-    'car',
-    'train',
-    'person',
-    'traffic light',
-    'stop sign',
-    'fire hydrant'
-]
-image_size = (100,100,3)
 # %%
 """
 this loads all of the data from the tfds into folders

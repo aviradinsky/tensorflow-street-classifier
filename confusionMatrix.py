@@ -48,7 +48,7 @@ objects = os.listdir(os.getcwd()+"/data/test")
 objects.sort()
 confusion_mtx= np.zeros((11,11))
 for x in range(len(y_pred)): #merge all batches into one matrix
-    confusion_mtx += tfds.as_numpy(tf.math.confusion_matrix(y_true[i], y_pred[i])) 
+    confusion_mtx += tfds.as_numpy(tf.math.confusion_matrix(y_true[x], y_pred[x], num_classes=11)) 
 plt.figure(figsize=(11, 11))
 sns.heatmap(confusion_mtx, xticklabels= objects, yticklabels= objects, annot=True, fmt='g')
 plt.xlabel('Prediction')
