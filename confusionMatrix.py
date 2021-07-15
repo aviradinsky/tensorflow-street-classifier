@@ -49,8 +49,10 @@ objects.sort()
 confusion_mtx= np.zeros((11,11))
 for x in range(len(y_pred)): #merge all batches into one matrix
     confusion_mtx += tfds.as_numpy(tf.math.confusion_matrix(y_true[x], y_pred[x], num_classes=11)) 
+#%%
 plt.figure(figsize=(11, 11))
-sns.heatmap(confusion_mtx, xticklabels= objects, yticklabels= objects, annot=True, fmt='g')
+confusion_mtx = confusion_mtx/confusion_mtx.sum(axis=1)[:, tf.newaxis]
+sns.heatmap(confusion_mtx, xticklabels= objects, yticklabels= objects, annot=True, fmt='.2%')
 plt.xlabel('Prediction')
 plt.ylabel('Label')
 plt.show()
