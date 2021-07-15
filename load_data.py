@@ -141,6 +141,6 @@ def main(
                 tf.keras.preprocessing.image.save_img(f'{directory}/{label}/{number_of_images_so_far}.jpg',image)
                 number_of_images_so_far += 1
                 if number_of_images_so_far % 1000 == 0:
-                    print(f'{number_of_images_so_far = }')
+                    print(f'{number_of_images_so_far}')
 # %%
 main()
