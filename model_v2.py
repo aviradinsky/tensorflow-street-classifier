@@ -76,6 +76,9 @@ history = model.fit(
     validation_data=validate_data,
     epochs=epochs
 )
+model.save(model_dir)
+import confusionMatrix
+# %%
 acc = history.history['accuracy']
 val_acc = history.history['val_accuracy']
 loss = history.history['loss']
@@ -97,7 +100,6 @@ plt.legend(loc='upper right')
 plt.title('Training and Validation Loss')
 plt.show()
 #%%
-model.save(model_dir)
 #%%
 test_data = tf.keras.preprocessing.image_dataset_from_directory(
     directory=f'{directory}/test',
@@ -111,4 +113,3 @@ test_data = tf.keras.preprocessing.image_dataset_from_directory(
 test_loss, test_acc = model.evaluate(test_data, verbose=2)
 print(f'test_acc = {test_acc}')
 #%%
-
