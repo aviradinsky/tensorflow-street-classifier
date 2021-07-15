@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from tensorflow.python.keras.layers.core import Dropout
 import load_data
 import os
-from params import chosen_labels, image_size
+from params import chosen_labels, image_size, model_dir
 # %%
 # %%
 """
@@ -19,7 +19,6 @@ load_data.main(
 # %%
 directory = f'{os.getcwd()}/data'
 
-image_size = (100,100,3)
 train_data = tf.keras.preprocessing.image_dataset_from_directory(
     directory=f'{directory}/train',
     labels='inferred',
@@ -98,7 +97,7 @@ plt.legend(loc='upper right')
 plt.title('Training and Validation Loss')
 plt.show()
 #%%
-model.save('model')
+model.save(model_dir)
 #%%
 test_data = tf.keras.preprocessing.image_dataset_from_directory(
     directory=f'{directory}/test',
