@@ -31,7 +31,7 @@ def display_crops(img: Image.Image, crops: list,
         window_dimensions (tuple): dimensions of the cropping window
         stride (int): the stride
     """
-    print('BEGIN PYPLOT CROPS DISPLAY')
+    # print('BEGIN PYPLOT CROPS DISPLAY')
     rows = 1 + math.ceil((img.height - window_dimensions[1]) / stride)
     columns = 1 + math.ceil((img.width - window_dimensions[0]) / stride)
     figsize = (10 * columns, 10 * rows)
@@ -50,7 +50,7 @@ def display_crops(img: Image.Image, crops: list,
 
     plt.show()
 
-    print('END PYPLOT CROPS DISPLAY \n')
+    # print('END PYPLOT CROPS DISPLAY \n')
 
 #%%
 
@@ -66,7 +66,7 @@ def get_scaled_images(img: Image.Image, count=3, increment=.5):
         list of PIL.Image.Image: the resized images
     """
     
-    print('START IMAGE RESCALING')
+    # print('START IMAGE RESCALING')
     imgs = []
 
     # add images from smallest to largest
@@ -78,13 +78,13 @@ def get_scaled_images(img: Image.Image, count=3, increment=.5):
                     )
         # new_dims = (int(width), int(length))
         imgs.append(img.resize(new_dims))
-        print('image size: ', new_dims)
+        # print('image size: ', new_dims)
 
     # apppend the original image before adding larger images
     imgs.append(img)
     
-    print('original image size: ', tuple(img.size))
-    print('END IMAGE RESCALING \n')
+    # print('original image size: ', tuple(img.size))
+    # print('END IMAGE RESCALING \n')
     return imgs
 
 #%%
@@ -112,8 +112,8 @@ def sliding_window(image: Image.Image, window_dim: tuple, stride: int):
                 (left_bound, upper_bound, right_bound, lower_bound)
     """
 
-    print('START WINDOW SLIDING')
-    print('cropping im size:' + str(image.size))
+    # print('START WINDOW SLIDING')
+    # print('cropping im size:' + str(image.size))
 
     if window_dim[0] > image.width or window_dim[1] > image.height:
         print(f'Crop dimenstions of {window_dim} were bigger than image'
@@ -151,9 +151,8 @@ def sliding_window(image: Image.Image, window_dim: tuple, stride: int):
             if right_bound == image.width:
                 break
 
-    print('total sliding crops: ' + str(tally))
-
-    print('END WINDOW SLIDING \n')
+    # print('total sliding crops: ' + str(tally))
+    # print('END WINDOW SLIDING \n')
 
     return pictures
 
