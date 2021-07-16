@@ -56,7 +56,7 @@ def load_model(filepath, show_summary=True):
         tf.keras.Model: the model
     """
     # load the model
-    model = tf.keras.models.load_model('saved_model/my_model')
+    model = tf.keras.models.load_model(filepath)
     if show_summary:
         # Check its architecture
         model.summary()
@@ -112,11 +112,17 @@ def predict(model_path: str, test_image: Image.Image,
     on the given image.
 
     Args:
-        model_path (str): path to model.
+        model_path (str): path to model. If there is a model saved at
+                          the path, it will be loaded. Otherwise, the
+                          model module will be loaded, resulting in a
+                          model being trained and saved at this path.
         image (Image.Image): image for the model to predict.
         crop_dims (tuple): dimensions of sliding window crops.
         stride (int): sliding window stride.
     """
+    if not os.path.exists(model_path):
+        import model_v2
+
     model = load_model(model_path)
 
     # find and resize images to model input size
@@ -183,7 +189,10 @@ def predict_sas(model_path: str, image: Image.Image,
     pyramid scaling and sliding windows.
 
     Args:
-        model_path (str): path to model.
+        model_path (str): path to model. If there is a model saved at
+                          the path, it will be loaded. Otherwise, the
+                          model module will be loaded, resulting in a
+                          model being trained and saved at this path.
         image (Image.Image): image for the model to predict.
         crop_dims (tuple): dimensions of sliding window crops.
         stride (int): sliding window stride.
@@ -206,7 +215,10 @@ def predict_ss(model_path: str, image: Image.Image):
     selective search implementation.
 
     Args:
-        model_path (str): path to model on disk.
+        model_path (str): path to model. If there is a model saved at
+                          the path, it will be loaded. Otherwise, the
+                          model module will be loaded, resulting in a
+                          model being trained and saved at this path.
         image (Image.Image): image to feed into model.
     """
     # get crops and bboxes
@@ -225,7 +237,7 @@ def test():
     crop_dims = (65,100)
     stride = 40
 
-    predict_sas(model_path, test_image, crop_dims, stride)
+    # predict_sas(model_path, test_image, crop_dims, stride)
     print('******************\nEND SAS PREDICT\n******************')
     predict_ss(model_path, test_image)
     print('******************\nEND SS PREDICT\n******************')
