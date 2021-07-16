@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from tensorflow.python.keras.layers.core import Dropout
 import load_data
 import os
-from params import chosen_labels, image_size
+from params import chosen_labels, image_size, model_dir
 # %%
 # %%
 """
@@ -19,7 +19,6 @@ load_data.main(
 # %%
 directory = f'{os.getcwd()}/data'
 
-image_size = (100,100,3)
 train_data = tf.keras.preprocessing.image_dataset_from_directory(
     directory=f'{directory}/train',
     labels='inferred',
@@ -77,6 +76,9 @@ history = model.fit(
     validation_data=validate_data,
     epochs=epochs
 )
+model.save(model_dir)
+import confusionMatrix
+# %%
 acc = history.history['accuracy']
 val_acc = history.history['val_accuracy']
 loss = history.history['loss']
@@ -98,7 +100,6 @@ plt.legend(loc='upper right')
 plt.title('Training and Validation Loss')
 plt.show()
 #%%
-model.save('model')
 #%%
 test_data = tf.keras.preprocessing.image_dataset_from_directory(
     directory=f'{directory}/test',
@@ -112,4 +113,3 @@ test_data = tf.keras.preprocessing.image_dataset_from_directory(
 test_loss, test_acc = model.evaluate(test_data, verbose=2)
 print(f'test_acc = {test_acc}')
 #%%
-
