@@ -94,3 +94,17 @@ all_possible_labels = [
     'hair drier',
     'toothbrush',
 ]
+
+label_list = [
+    'background'
+    'bicycle',
+    'bus',
+    'car',
+    'fire hydrant'
+    'motorcycle',
+    'person',
+    'stop sign',
+    'traffic light',
+    'train',
+    'truck',
+]
