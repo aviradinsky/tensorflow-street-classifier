@@ -13,13 +13,13 @@ base_model=MobileNet(weights='imagenet',include_top=False) #imports the mobilene
 
 x=base_model.output
 x=GlobalAveragePooling2D()(x)
-x=Dense(1024,activation='relu')(x) #we add dense layers so that the model can learn more complex functions and classify for better results.
-x=Dense(1024,activation='relu')(x) #dense layer 2
-x=Dense(512,activation='relu')(x) #dense layer 3
-preds=Dense(len(chosen_labels) + 1,activation='softmax')(x) #final layer with softmax activation
+x=Dense(1024,activation='relu')(x)
+x=Dense(1024,activation='relu')(x)
+x=Dense(512,activation='relu')(x)
+preds=Dense(len(chosen_labels) + 1,activation='softmax')(x)
 
 
-# In[3]:
+#%%
 
 
 model=Model(inputs=base_model.input,outputs=preds)
@@ -28,7 +28,7 @@ model=Model(inputs=base_model.input,outputs=preds)
 #now a model has been created based on our architecture
 
 
-# In[4]:
+#%%
 
 
 for layer in model.layers[:20]:
@@ -37,21 +37,18 @@ for layer in model.layers[20:]:
     layer.trainable=True
 
 
-# In[5]:
+#%%
 
+train_datagen=ImageDataGenerator(preprocessing_function=preprocess_input)
 
-train_datagen=ImageDataGenerator(preprocessing_function=preprocess_input) #included in our dependencies
-
-train_generator=train_datagen.flow_from_directory('./data/train/', # this is where you specify the path to the main data folder
+train_generator=train_datagen.flow_from_directory('./data/train/', 
                                                  target_size=(224,224),
                                                  color_mode='rgb',
                                                  batch_size=32,
-                                                 class_mode='categorical',
                                                  shuffle=True)
 
 
-# In[33]:
-
+#%%
 
 model.compile(optimizer='Adam',loss='categorical_crossentropy',metrics=['accuracy'])
 # Adam optimizer
@@ -59,7 +56,7 @@ model.compile(optimizer='Adam',loss='categorical_crossentropy',metrics=['accurac
 # evaluation metric will be accuracy
 
 step_size_train=train_generator.n//train_generator.batch_size
-epochs = 5
+epochs = 15
 model.fit_generator(generator=train_generator,
                 steps_per_epoch=step_size_train,
                 epochs=epochs)
