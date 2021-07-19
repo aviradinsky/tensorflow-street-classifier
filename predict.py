@@ -199,9 +199,6 @@ def predict(model_path: str, test_image: Image.Image,
 
     print(f'number of background crops left out: {background_count}')
     img = Image.fromarray(img_array)
-    img = img.resize((750,1000))
-    nparray = np.array(img)
-    print(nparray.shape)
     display_image(np.array(img))
 
 # %%
