@@ -13,6 +13,7 @@ import tensorflow as tf
 import numpy as np
 import cv2 as cv
 import random
+import time
 import sys
 import os
 
@@ -22,19 +23,22 @@ import params
 
 # %%
 
-classes = {
-    0:   'bike',
-    1:   'motorcycle',
-    2:   'bus',
-    3:   'truck',
-    4:   'car',
-    5:   'train',
-    6:   'person',
-    7:   'traffic light',
-    8:   'stop sign',
-    9:   'fire hydrant',
-    10: 'background'
-}
+# classes = {
+#     0:   'bike',
+#     1:   'motorcycle',
+#     2:   'bus',
+#     3:   'truck',
+#     4:   'car',
+#     5:   'train',
+#     6:   'person',
+#     7:   'traffic light',
+#     8:   'stop sign',
+#     9:   'fire hydrant',
+#     10: 'background'
+# }
+classes = params.chosen_labels
+classes.append("background")
+classes.sort()
 
 # %%
 
@@ -137,18 +141,27 @@ def predict(model_path: str, test_image: Image.Image,
     # run predict on each crop
     print ('len crops: ' + str(len(crops)))
     tally = 0
-    cutoff = .85
+    cutoff = .8
     # keep track of crops that meet cutoff
     top_preds = []
 
-    for i, crop in enumerate(crops):
-        crop_tensor = tf.expand_dims(crop, 0)
-        predictions = model.predict(crop_tensor)
-        score = tf.nn.softmax(predictions)
+    # convert crops to tensors
+    tensors = [tf.convert_to_tensor(x) for x in crops]
+    # turn into batch
+    stacked = tf.stack(tensors)
+
+    start = time.time()
+    predictions = model.predict(stacked)
+    end = time.time()
+    elapsed = round(end - start, 5)
+    print(f'total predict time: {elapsed} seconds')
+
+    for i in range(len(predictions)):
+        pred = predictions[i]
+        score = tf.nn.softmax(pred)
         im_class = classes[np.argmax(score)]
-        # store crop if probability meets the cutoff
         if tf.reduce_max(score).numpy() >= cutoff:
-            top_preds.append((crop, bboxes[i], im_class))
+            top_preds.append((crops[i], bboxes[i], im_class))
             tally += 1
 
     print(f'total crops with prob > {cutoff}: ', tally)
@@ -157,15 +170,22 @@ def predict(model_path: str, test_image: Image.Image,
     random.shuffle(top_preds)
     # draw bounding boxes on original image
     img_array = np.array(test_image.copy())
+    i = 0
+    
+    background_count = 0
 
-    for i, crop_tupl in enumerate(top_preds):
+    # each crop_tupl has three elements: (image, bbox, class_label)
+    for crop_tupl in top_preds:
         # create color of bounding box (at random)
         colors = []
         for _ in range(3):
             colors.append(random.randint(0,255))
-
-        # each crop_tupl has three elements: (image, bbox, class_label)
-        if i < 10:    
+        if crop_tupl[2] == 'background':
+            background_count += 1
+            continue
+            # sys.exit()
+        if i < 20:
+        # if crop_tupl[2] == 'person':
             # bboxes are in order of (left, top, right, bottom)
             top_left = (crop_tupl[1][0], crop_tupl[1][1])
             bottom_right = (crop_tupl[1][2], crop_tupl[1][3])
@@ -175,10 +195,14 @@ def predict(model_path: str, test_image: Image.Image,
             txt_pos = (top_left[0], bottom_right[1] + 20)
             cv.putText(img_array, crop_tupl[2], txt_pos,
                        cv.FONT_HERSHEY_DUPLEX, 1,(0,0,0),2)
-        else:
-            break
+            i += 1
 
-    display_image(img_array)
+    print(f'number of background crops left out: {background_count}')
+    img = Image.fromarray(img_array)
+    img = img.resize((750,1000))
+    nparray = np.array(img)
+    print(nparray.shape)
+    display_image(np.array(img))
 
 # %%
 
@@ -229,9 +253,23 @@ def predict_ss(model_path: str, image: Image.Image):
 # %%
 
 def test():
-    # get test image
-    img_path = 'predict_img.jpg'
-    test_image = Image.open(img_path)
+    start = time.time()
+    # # get test image
+    # img_path = 'predict_img.jpg'
+    # test_image = Image.open(img_path)
+    x=0
+    images=[]
+    for data in tfds.as_numpy(tfds.load('coco').get('test2015')):
+        #print(data)
+        if(x>5):
+            break
+
+        image = Image.fromarray(data['image']) 
+        #image.show()
+        #print(data['image/filename'].decode("utf-8") )
+        images.append(image)
+        x+=1
+    test_image =images[1]
 
     model_path = params.model_dir
     crop_dims = (65,100)
@@ -241,6 +279,10 @@ def test():
     print('******************\nEND SAS PREDICT\n******************')
     predict_ss(model_path, test_image)
     print('******************\nEND SS PREDICT\n******************')
+    end = time.time()
+    elapsed = end - start
+    print(f'total predict time was: {elapsed}')
+    display_image(test_image)
 
 # %%
 
