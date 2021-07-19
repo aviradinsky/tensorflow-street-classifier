@@ -96,11 +96,11 @@ all_possible_labels = [
 ]
 
 label_list = [
-    'background'
+    'background',
     'bicycle',
     'bus',
     'car',
-    'fire hydrant'
+    'fire hydrant',
     'motorcycle',
     'person',
     'stop sign',
