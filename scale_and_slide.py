@@ -172,11 +172,11 @@ def get_image_chunks(img: Image.Image, window_dim: tuple, stride: int,
         rescale_increment (float, optional): fraction by which to 
                                  increase image after each resize
     Returns:
-        list: a list tuples. Each frop is represented by a tuple of 
+        list: a list tuples. Each crop is represented by a tuple of 
         length 2, where the array of the crop is stored at position
-        [0] and its location in the original image is stored at 
-        position [1].  The order of the tuple is as follows:
-            (left_bound, upper_bound, right_bound, lower_bound)
+        [0] and its bbox in the original image is stored at 
+        position [1].  The order of the bbox is:
+                                (left, top, right, bottom)
     """
 
     # first task - rescale the image into multiple sizes

@@ -44,7 +44,8 @@ def display_bounding_boxes(img: np.array, points: list):
 		plt.imshow(copy)
 		plt.show()
 
-		copy = cv.cvtColor(cv.imread('predict_img.jpg'), cv.COLOR_BGR2RGB)
+		# copy = cv.cvtColor(cv.imread('./test_images/predict_img.jpg'), cv.COLOR_BGR2RGB)
+		copy = img.copy()
 
 #%%
 
@@ -58,7 +59,11 @@ def selective_search(img: np.array, display_boxes=False):
 		display_boxes (bool, optional): Defaults to False.
 
 	Returns:
-		list: list of numpy.array of image crops.
+        list: a list tuples. Each crop is represented by a tuple of 
+        length 2, where the array of the crop is stored at position
+        [0] and its bbox in the original image is stored at 
+        position [1].  The order of the bbox is:
+                                (left, top, right, bottom)
 	"""
 	# speed-up using multithreads
 	cv.setUseOptimized(True);
@@ -116,7 +121,7 @@ def selective_search(img: np.array, display_boxes=False):
 #%%
 
 def test():
-	image = cv.cvtColor(cv.imread('predict_img.jpg'), cv.COLOR_BGR2RGB)
+	image = cv.cvtColor(cv.imread('./test_images/predict_img.jpg'), cv.COLOR_BGR2RGB)
 	crops = selective_search(image, display_boxes=True)
 	# get just the pictures
 	crops = [img for img, tup in crops]
