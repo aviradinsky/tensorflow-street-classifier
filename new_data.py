@@ -81,7 +81,7 @@ def main(directory = f'{os.getcwd()}', chosen_labels_string = params.new_labels)
     count_of_labels_dict = {}
 
     for string in chosen_labels_string:
-        if(string=="truck" ):
+        if(string=="truck"):
             continue
         s = string.replace(' ', '_')
         count_of_labels_dict[s] = 0
@@ -137,6 +137,8 @@ def main(directory = f'{os.getcwd()}', chosen_labels_string = params.new_labels)
                 if image is None:
                     continue
                 label = send[1].replace(' ','_')
+                if(label =="truck"):
+                    label = "car"
                 if count_of_labels_dict[label] > 15000:
                     continue
                 else:
@@ -153,9 +155,10 @@ def main(directory = f'{os.getcwd()}', chosen_labels_string = params.new_labels)
                     label = f'train/{label}'
                 tf.keras.preprocessing.image.save_img(f'{directory}/{label}/{number_of_images_so_far}.jpg',image)
                 number_of_images_so_far += 1
-                used_image = False
+                
                 if number_of_images_so_far % 1000 == 0:
-                    print("number of used :" + number_of_images_so_far + " images used: " + used_image)
+                    print("number of used :" + str(number_of_images_so_far) + " images used: " + str(imagecount))
+            used_image = False
     print("open images")
     for sample in open_data:
 
@@ -168,6 +171,8 @@ def main(directory = f'{os.getcwd()}', chosen_labels_string = params.new_labels)
             label =box['label']
             label =label.lower()
             label=label.replace(" ", "_")
+            if(label =="truck"):
+                label = "car"
             cropSize = (box["bounding_box"][0]*width,
                         box["bounding_box"][1]*height,
                         box["bounding_box"][2]*width +box["bounding_box"][0]*width ,
@@ -175,7 +180,7 @@ def main(directory = f'{os.getcwd()}', chosen_labels_string = params.new_labels)
             crop = i.crop(cropSize)
             if(crop.width<50 or crop.height<50):
                 continue
-            if count_of_labels_dict[label] > 15000:
+            if (count_of_labels_dict.get(label,"no") == "no" or count_of_labels_dict[label] > 15000):
                     continue
             else:
                 if(used_image==False):
@@ -191,10 +196,10 @@ def main(directory = f'{os.getcwd()}', chosen_labels_string = params.new_labels)
                 label = f'train/{label}'
             crop.save(f'{directory}/{label}/{number_of_images_so_far}.jpg')
             number_of_images_so_far += 1
-            used_image = False
+            
             if number_of_images_so_far % 1000 == 0:
-                print("number of used :" + number_of_images_so_far + " images used: " + used_image)
-
+                print("number of used :" + str(number_of_images_so_far) + " images used: " + str(imagecount))
+        used_image = False
 # %%
 main()
 # %%
