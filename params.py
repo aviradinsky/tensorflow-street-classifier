@@ -108,3 +108,11 @@ label_list = [
     'train',
     'truck',
 ]
+new_labels = [
+    'bicycle',
+    'motorcycle',
+    'truck',
+    'car',
+    'train',
+    'person',
+]
