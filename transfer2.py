@@ -5,28 +5,23 @@ import os
 import tensorflow as tf
 from tensorflow.keras import preprocessing
 from tensorflow.keras.preprocessing import image_dataset_from_directory
-from params import image_size, label_list, model_dir
-import load_data
+from tensorflow.python.keras.engine import training
+from params import image_size, model_dir, new_labels
 # %%
-load_data.main()
-# %%
-class_number = len(label_list) # for background
+class_number = len(new_labels) # for background
 IMG_SIZE = image_size[:2]
 BATCH_SIZE = 32
 # %%
 model = tf.keras.applications.ResNet50(weights='imagenet')
-# %%
 base_model = tf.keras.applications.ResNet50(weights='imagenet',include_top=False)
+preprocess_input = tf.keras.applications.resnet50.preprocess_input
 # %%
-x = base_model.output
+inputs = tf.keras.Input(shape=image_size)
+x = preprocess_input(inputs)
+x = base_model(x, training, False)
 x = tf.keras.layers.GlobalAveragePooling2D()(x)
-# %%
-x = tf.keras.layers.Dense(1024, activation='relu')(x)
-x = tf.keras.layers.Dense(1024, activation='relu')(x)
-x = tf.keras.layers.Dense(1024, activation='relu')(x)
-x = tf.keras.layers.Dense(512, activation='relu')(x)
+x = tf.keras.layers.Dropout(0.2)(x)
 preds = tf.keras.layers.Dense(class_number, activation ='softmax')(x)
-# %%
 model = tf.keras.models.Model(inputs=base_model.input, outputs=preds)
 # %%
 """
@@ -41,13 +36,17 @@ for layer in model.layers[braek:]:
 train_datagen = tf.keras.preprocessing.image.ImageDataGenerator(preprocessing_function=tf.keras.applications.resnet50.preprocess_input)
 # %%
 train_generator = train_datagen.flow_from_directory(
-    './data/train', 
-    target_size = (224, 224),
+    './newdata/train', 
+    target_size = image_size,
     color_mode = 'rgb',
-    batch_size = 32,
+    batch_size = 64,
     class_mode = 'categorical',
     shuffle = True
 )
+"""
+AUTOTUNE = tf.data.experimental.AUTOTUNE
+train_generator = train_generator.prefetch(buffer_size = AUTOTUNE)
+"""
 # %%
 print(model.summary())
 # %%
