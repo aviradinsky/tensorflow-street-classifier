@@ -5,9 +5,10 @@ import matplotlib.pyplot as plt
 import os
 import numpy as np
 import seaborn as sns
+import params
 #%%
-model = tf.keras.models.load_model('model')
-directory = f'{os.getcwd()}/data/'
+model = tf.keras.models.load_model('newModelTransfer')
+directory = f'{os.getcwd()}/newdata/'
 image_size = (100,100,3)
 test_data = tf.keras.preprocessing.image_dataset_from_directory(
     directory=f'{directory}/test',
@@ -29,8 +30,7 @@ for image, label in tfds.as_numpy(test_data):
     x+=1
 
 #%%
-#del test_images[-1]
-#del test_labels[-1]
+
 y_pred = []
 x=0
 for batch in test_images:
@@ -44,13 +44,12 @@ for i in range(len(y_pred)):
     test_acc = sum(y_pred[i] == y_true[i]) / len(y_true[i]) 
     print(f'Test set accuracy: {test_acc}') #per batch
 #%%
-objects = os.listdir(os.getcwd()+"/data/test")
-objects.sort()
-confusion_mtx= np.zeros((11,11))
+objects = params.new_labels_list
+confusion_mtx= np.zeros((6,6))
 for x in range(len(y_pred)): #merge all batches into one matrix
-    confusion_mtx += tfds.as_numpy(tf.math.confusion_matrix(y_true[x], y_pred[x], num_classes=11)) 
+    confusion_mtx += tfds.as_numpy(tf.math.confusion_matrix(y_true[x], y_pred[x], num_classes=6)) 
 #%%
-plt.figure(figsize=(11, 11))
+plt.figure(figsize=(6, 6))
 confusion_mtx = confusion_mtx/confusion_mtx.sum(axis=1)[:, tf.newaxis]
 sns.heatmap(confusion_mtx, xticklabels= objects, yticklabels= objects, annot=True, fmt='.2%')
 plt.xlabel('Prediction')
