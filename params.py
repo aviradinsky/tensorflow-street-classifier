@@ -10,7 +10,7 @@ chosen_labels = [
     'stop sign',
     'fire hydrant'
 ]
-image_size = (100,100,3)
+image_size = (160,160,3)
 model_dir = 'model'
 all_possible_labels = [
     'person',
