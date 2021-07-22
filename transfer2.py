@@ -5,19 +5,14 @@ import os
 import tensorflow as tf
 from tensorflow.keras import preprocessing
 from tensorflow.keras.preprocessing import image_dataset_from_directory
-<<<<<<< HEAD
 from tensorflow.python.keras.engine import training
-from params import image_size, model_dir, new_labels
-# %%
-class_number = len(new_labels) # for background
-=======
 from params import image_size, label_list, model_dir, new_labels_list
 import load_data
 # %%
 load_data.main()
 # %%
 class_number = len(new_labels_list) # for background
->>>>>>> newModel
+
 IMG_SIZE = image_size[:2]
 BATCH_SIZE = 32
 # %%
@@ -44,16 +39,10 @@ for layer in model.layers[braek:]:
 # %%
 train_datagen = tf.keras.preprocessing.image.ImageDataGenerator(preprocessing_function=tf.keras.applications.resnet50.preprocess_input,validation_split=0.2)
 # %%
-<<<<<<< HEAD
-train_generator = train_datagen.flow_from_directory(
-    './newdata/train', 
-    target_size = image_size,
-=======
 directory = f'{os.getcwd()}/newdata'
 train_generatorTrain = train_datagen.flow_from_directory(
     f'{directory}/train', 
     target_size = (100, 100),
->>>>>>> newModel
     color_mode = 'rgb',
     batch_size = 64,
     class_mode = 'categorical',
