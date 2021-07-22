@@ -120,8 +120,8 @@ new_labels_list = [
     'background',
     'bicycle',
     'car',
-    'person',
     'motorcycle',
+    'person',
     'train',
     
 ]
