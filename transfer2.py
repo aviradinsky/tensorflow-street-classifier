@@ -8,6 +8,7 @@ from tensorflow.keras.preprocessing import image_dataset_from_directory
 from tensorflow.python.keras.engine import training
 from params import image_size, label_list, model_dir, new_labels_list
 import load_data
+import confusionMatrix as cm
 # %%
 load_data.main()
 # %%
@@ -102,6 +103,6 @@ plt.legend(loc='upper right')
 plt.title('Training and Validation Loss')
 plt.show()
 # %%
-import confusionMatrix
+cm.matrix('newModelTransfer')
 
 #%%
