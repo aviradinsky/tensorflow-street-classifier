@@ -17,6 +17,7 @@ import time
 import sys
 import os
 
+# from nms import nms
 import scale_and_slide as sas
 import selective_search as ss
 import params
@@ -49,7 +50,7 @@ def display_image(image):
     plt.show()
 # %%
 
-def load_model(filepath, show_summary=True):
+def load_model(filepath, show_summary=False):
     """Get the model stored at the given filepath
 
     Args:
@@ -113,7 +114,7 @@ def get_ss_crops(image: Image.Image):
 
 # %%
 
-def predict(model_path: str, test_image: Image.Image, 
+def infer(model_path: str, test_image: Image.Image, 
             crops: list, bboxes: list):
     """Display bounding boxes and labels detected by the given model 
     on the given image.
@@ -123,7 +124,7 @@ def predict(model_path: str, test_image: Image.Image,
                           the path, it will be loaded. Otherwise, the
                           model module will be loaded, resulting in a
                           model being trained and saved at this path.
-        test_image (Image.Image): image for the model to predict.
+        test_image (Image.Image): image on which to run inference.
         crops (list): list of crops of the test_image
         bboxes (list): list of bbox coordinates of each of the crops.
                        bbox coordinates have order: 
@@ -146,7 +147,7 @@ def predict(model_path: str, test_image: Image.Image,
 
     # run predict on all crops
     tally = 0
-    cutoff = .8
+    cutoff = .95
     # keep track of crops that meet cutoff
     top_preds = []
 
@@ -162,14 +163,35 @@ def predict(model_path: str, test_image: Image.Image,
     print(f'total predict time: {elapsed} seconds')
 
     for i in range(len(predictions)):
+        # if i >= 20:
+        #     sys.exit()
         pred = predictions[i]
         score = tf.nn.softmax(pred)
         im_class = classes[np.argmax(score)]
+        # if im_class != 'background':
+        #     print(score)
+        print(score)
         if tf.reduce_max(score).numpy() >= cutoff:
-            top_preds.append((crops[i], bboxes[i], im_class))
+            top_preds.append((crops[i], bboxes[i], im_class, np.amax(score)))
             tally += 1
 
     print(f'total crops with prob > {cutoff}: ', tally)
+    # # gather data to run nms
+    # top_bboxes = [b for (a,b,c,d) in top_preds]
+    # top_scores = [d for (a,b,c,d) in top_preds]
+    # nms_bboxes = nms(top_bboxes, top_scores)
+    # # draw bboxes on image
+    # img_array = np.array(test_image.copy())
+    # for box in nms_bboxes:
+    #     pt1 = (box[0], box[1])
+    #     pt2 = (box[2], box[3])
+    #     # generate random colors
+    #     colors = []
+    #     for _ in range(3):
+    #         colors.append(random.randint(0,255))
+    #     img_array = cv.rectangle(img_array, pt1, pt2, colors, thickness=3)
+    # img = Image.fromarray(img_array)
+    # display_image(np.array(img))        
 
     # draw bounding boxes on original image
     img_array = np.array(test_image.copy())
@@ -177,7 +199,8 @@ def predict(model_path: str, test_image: Image.Image,
     
     background_count = 0
 
-    # each crop_tupl has three elements: (image, bbox, class_label)
+    # each crop_tupl has four elements:
+    #           (image, bbox, class_label, probability)
     for crop_tupl in top_preds:
         # create color of bounding box (at random)
         colors = []
@@ -187,7 +210,7 @@ def predict(model_path: str, test_image: Image.Image,
             background_count += 1
             continue
         if i < 20:
-        # if crop_tupl[2] == 'person':
+        # if crop_tupl[2] == 'person' and i < 20:
             # bboxes are in order of (left, top, right, bottom)
             top_left = (crop_tupl[1][0], crop_tupl[1][1])
             bottom_right = (crop_tupl[1][2], crop_tupl[1][3])
@@ -205,7 +228,7 @@ def predict(model_path: str, test_image: Image.Image,
 
 # %%
 
-def predict_sas(model_path: str, image: Image.Image, 
+def infer_sas(model_path: str, image: Image.Image, 
             crop_dims: tuple, stride: int):
     """Display bounding boxes and labels detected by the given model 
     on the given image. The bounding boxes are generated through
@@ -216,7 +239,7 @@ def predict_sas(model_path: str, image: Image.Image,
                           the path, it will be loaded. Otherwise, the
                           model module will be loaded, resulting in a
                           model being trained and saved at this path.
-        image (Image.Image): image for the model to predict.
+        image (Image.Image): image on which to run inference.
         crop_dims (tuple): dimensions of sliding window crops.
         stride (int): sliding window stride.
     """
@@ -227,12 +250,12 @@ def predict_sas(model_path: str, image: Image.Image,
     display_image(test_image)
     # get crops and bboxes
     crops, bboxes = get_sas_crops(test_image, crop_dims, stride)
-    # run predict
-    predict(model_path, image, crops, bboxes)
+    # run inference
+    infer(model_path, image, crops, bboxes)
 
 # %%
 
-def predict_ss(model_path: str, image: Image.Image):
+def infer_ss(model_path: str, image: Image.Image):
     """Display bounding boxes and labels detected by the given model 
     on the given image. The bounding boxes are generated by the cv2
     selective search implementation.
@@ -246,15 +269,15 @@ def predict_ss(model_path: str, image: Image.Image):
     """
     # get crops and bboxes
     crops, bboxes = get_ss_crops(image)
-    # run predict
-    predict(model_path, image, crops, bboxes)
+    # run inference
+    infer(model_path, image, crops, bboxes)
     
 # %%
 
 def test():
     start = time.time()
     # get test image
-    img_path = './test_images/predict_img_2.jpg'
+    img_path = './test_images/predict_img_1.jpg'
     test_image = Image.open(img_path)
 
     # model_path = params.model_dir
@@ -262,13 +285,13 @@ def test():
     crop_dims = (65,100)
     stride = 40
 
-    # predict_sas(model_path, test_image, crop_dims, stride)
+    # infer_sas(model_path, test_image, crop_dims, stride)
     print('******************\nEND SAS PREDICT\n******************')
-    predict_ss(model_path, test_image)
+    infer_ss(model_path, test_image)
     print('******************\nEND SS PREDICT\n******************')
     end = time.time()
     elapsed = end - start
-    print(f'total predict time was: {elapsed}')
+    print(f'total inference time was: {elapsed}')
     display_image(test_image)
 
 # %%
