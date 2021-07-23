@@ -17,7 +17,7 @@ import time
 import sys
 import os
 
-# from nms import nms
+from nms import nms
 import scale_and_slide as sas
 import selective_search as ss
 import params
@@ -147,7 +147,7 @@ def infer(model_path: str, test_image: Image.Image,
 
     # run predict on all crops
     tally = 0
-    cutoff = .95
+    cutoff = .22
     # keep track of crops that meet cutoff
     top_preds = []
 
@@ -168,63 +168,43 @@ def infer(model_path: str, test_image: Image.Image,
         pred = predictions[i]
         score = tf.nn.softmax(pred)
         im_class = classes[np.argmax(score)]
-        # if im_class != 'background':
-        #     print(score)
-        # print(score)
-        if tf.reduce_max(score).numpy() >= cutoff:
+        # filter out bboxes that are above the cutoff and not background
+        if tf.reduce_max(score).numpy() >= cutoff and im_class != 'background':
             top_preds.append((crops[i], bboxes[i], im_class, np.amax(score)))
             tally += 1
 
     print(f'total crops with prob > {cutoff}: ', tally)
-    # # gather data to run nms
-    # top_bboxes = [b for (a,b,c,d) in top_preds]
-    # top_scores = [d for (a,b,c,d) in top_preds]
-    # nms_bboxes = nms(top_bboxes, top_scores)
-    # # draw bboxes on image
-    # img_array = np.array(test_image.copy())
-    # for box in nms_bboxes:
-    #     pt1 = (box[0], box[1])
-    #     pt2 = (box[2], box[3])
-    #     # generate random colors
-    #     colors = []
-    #     for _ in range(3):
-    #         colors.append(random.randint(0,255))
-    #     img_array = cv.rectangle(img_array, pt1, pt2, colors, thickness=3)
-    # img = Image.fromarray(img_array)
-    # display_image(np.array(img))        
 
-    # draw bounding boxes on original image
+    # gather data to run nms
+    top_bboxes = [b for (a,b,c,d) in top_preds]
+    top_scores = [d for (a,b,c,d) in top_preds]
+    max_output_size = 17
+    indices = nms(top_bboxes, top_scores, max_output_size=max_output_size)
+    # make list of bboxes with accompanying model label predictions
+    bxs = []
+    for i in indices:
+        # tuples have order (bbox, label)
+        bxs.append((top_bboxes[i],top_preds[i][2]))
+    # draw bboxes on image and display label underneath
     img_array = np.array(test_image.copy())
-    i = 0
-    
-    background_count = 0
 
-    # each crop_tupl has four elements:
-    #           (image, bbox, class_label, probability)
-    for crop_tupl in top_preds:
-        # create color of bounding box (at random)
+    # display bboxes and labels
+    for tupl in bxs:
+        bbox = tupl[0]
+        label = tupl[1]
+        # opposite corners that define bbox
+        pt1 = (bbox[0], bbox[1])
+        pt2 = (bbox[2], bbox[3])
+        # choose random colors for bbox
         colors = []
         for _ in range(3):
             colors.append(random.randint(0,255))
-        if crop_tupl[2] == 'background':
-            background_count += 1
-            continue
-        if i < 20:
-        # if crop_tupl[2] == 'person' and i < 20:
-            # bboxes are in order of (left, top, right, bottom)
-            top_left = (crop_tupl[1][0], crop_tupl[1][1])
-            bottom_right = (crop_tupl[1][2], crop_tupl[1][3])
-            img_array = cv.rectangle(img_array, pt1=top_left, 
-                                    pt2=bottom_right, color=tuple(colors),
-                                    thickness=3)
-            txt_pos = (top_left[0], bottom_right[1] + 20)
-            cv.putText(img_array, crop_tupl[2], txt_pos,
-                       cv.FONT_HERSHEY_DUPLEX, 1,(0,0,0),2)
-            i += 1
+        img_array = cv.rectangle(img_array, pt1, pt2, colors, thickness=3)
+        txt_pos = (pt1[0], pt2[1] + 20)
+        cv.putText(img_array, label, txt_pos,
+                   cv.FONT_HERSHEY_DUPLEX, 1, (0,0,0), 2)
 
-    print(f'number of background crops left out: {background_count}')
-    img = Image.fromarray(img_array)
-    display_image(np.array(img))
+    display_image(np.array(img_array))
 
 # %%
 
@@ -298,133 +278,5 @@ def test():
 
 if __name__ == '__main__':
     test()
-
-# %%
-
-# image = Image.open(',/test_images/predict_img_1.jpg')
-# # resize image to width of 750 px, and proportional height
-# factor = 750 / image.width
-# size = (int(image.width * factor), int(image.height * factor))
-# test_image = image.resize(size)
-
-# model_path = params.model_dir
-# crops, bboxes = get_ss_crops(test_image)
-# model = load_model(model_path)
-
-# # find and resize images to model input size
-# in_tensor = keras.backend.int_shape(model.layers[0].input)
-# input_size = (in_tensor[1], in_tensor[2], in_tensor[3])
-
-# for i, crop in enumerate(crops):
-#     im = Image.fromarray(np.uint8(crop)).convert('RGB')
-#     im = im.resize((input_size[0], input_size[1]))
-#     crops[i] = np.array(im)
-
-# # run predict on each crop
-# print ('len crops: ' + str(len(crops)))
-# tally = 0
-# cutoff = 0.7
-# # keep track of crops that meet cutoff
-# top_preds = []
-
-# # convert crops to tensors
-# tensors = [tf.convert_to_tensor(x) for x in crops]
-# # turn into batch
-# stacked = tf.stack(tensors)
-
-# # %%
-
-# start = time.time()
-# predictions = model.predict(stacked)
-# end = time.time()
-# elapsed = round(end - start, 5)
-# print(f'total predict time: {elapsed} seconds')
-
-# for i in range(len(predictions)):
-#     pred = predictions[i]
-#     score = tf.nn.softmax(pred)
-#     im_class = classes[np.argmax(score)]
-#     if tf.reduce_max(score).numpy() >= cutoff:
-#         top_preds.append((crops[i], bboxes[i], im_class, np.amax(score)))
-#         tally += 1
-
-# # %%
-
-# counts = {
-#     'bicycle' : [],
-#     'motorcycle' : [],
-#     'bus' : [],
-#     'truck' : [],
-#     'car' : [],
-#     'train' : [],
-#     'person' : [],
-#     'traffic light' : [],
-#     'stop sign' : [],
-#     'fire hydrant' : []
-#     # 'background' : []
-# }
-
-# for crop_tupl in top_preds:
-#     clss = crop_tupl[2]
-#     if clss == 'background':
-#         continue
-#     elif len(counts[clss]) >= 20:
-#         continue
-#     else:
-#         counts[clss].append(crop_tupl)
-
-# # for i in range(len(top_preds)):
-# #     clss = classes[np.argmax(tf.nn.softmax(predictions[i]))]
-# #     if clss == 'background':
-# #         continue
-# #     elif len(counts[clss]) >= 20:
-# #         continue
-# #     else:
-# #         counts[clss].append(crops[i])
-        
-# for x, y in counts.items():
-#     print(f'length of {x} list: {len(y)}')
-#     # sys.exit()
-
-
-# # %%
-
-# curr_list = counts['person']
-
-# img_array = np.array(test_image.copy())
-# i = 0
-
-# background_count = 0
-
-
-
-# # each crop_tupl has three elements: (image, bbox, class_label)
-# for crop_tupl in curr_list:
-#     # create color of bounding box (at random)
-#     colors = []
-#     for _ in range(3):
-#         colors.append(random.randint(0,255))
-#     if crop_tupl[2] == 'background':
-#         background_count += 1
-#         continue
-#         # sys.exit()
-#     # if i < 20:
-#     # if (crop_tupl[2] == 'person' or crop_tupl[2] == 'bicycle') and i < 20:
-#     else:
-#         # bboxes are in order of (left, top, right, bottom)
-#         top_left = (crop_tupl[1][0], crop_tupl[1][1])
-#         bottom_right = (crop_tupl[1][2], crop_tupl[1][3])
-#         img_array = cv.rectangle(img_array, pt1=top_left, 
-#                                 pt2=bottom_right, color=tuple(colors),
-#                                 thickness=3)
-#         txt_pos = (top_left[0], bottom_right[1] + 20)
-#         # cv.putText(img_array, crop_tupl[2], txt_pos,
-#         #            cv.FONT_HERSHEY_DUPLEX, 1,(0,0,0),1)
-#         i += 1
-
-# print(f'number of background crops left out: {background_count}')
-# img = Image.fromarray(img_array)
-# display_image(np.array(img))
-
 
 # %%
