@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from tensorflow.python.keras.layers.core import Dropout
 import load_data
 import os
-from params import chosen_labels, image_size, model_dir
+from params import chosen_labels, image_size, model_dir, new_labels
 # %%
 # %%
 """
@@ -14,10 +14,10 @@ this loads all of the data from the tfds into folders
 """
 load_data.main(
     directory=os.getcwd(),
-    chosen_labels_string=chosen_labels
+    chosen_labels_string=new_labels
 )
 # %%
-directory = f'{os.getcwd()}/data'
+directory = f'{os.getcwd()}/newdata'
 
 train_data = tf.keras.preprocessing.image_dataset_from_directory(
     directory=f'{directory}/train',
@@ -76,7 +76,7 @@ history = model.fit(
     validation_data=validate_data,
     epochs=epochs
 )
-model.save(model_dir)
+model.save("newModel")
 import confusionMatrix
 # %%
 acc = history.history['accuracy']

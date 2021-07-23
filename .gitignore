@@ -7,4 +7,5 @@ saved_model/
 model
 debugging/
 newdata/
+newModel/
 newModelTransfer/

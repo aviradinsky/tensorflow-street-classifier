@@ -36,9 +36,10 @@ import params
 #     9:   'fire hydrant',
 #     10: 'background'
 # }
-classes = params.chosen_labels
-classes.append("background")
-classes.sort()
+# classes = params.chosen_labels
+# classes.append("background")
+# classes.sort()
+classes = params.new_labels_list
 
 # %%
 
@@ -134,8 +135,9 @@ def predict(model_path: str, test_image: Image.Image,
     model = load_model(model_path)
 
     # find and resize images to model input size
-    in_tensor = keras.backend.int_shape(model.layers[0].input)
-    input_size = (in_tensor[1], in_tensor[2], in_tensor[3])
+    # in_tensor = keras.backend.int_shape(model.layers[0].input)
+    # input_size = (in_tensor[1], in_tensor[2], in_tensor[3])
+    input_size = params.image_size
    
     for i, crop in enumerate(crops):
         im = Image.fromarray(np.uint8(crop)).convert('RGB')
@@ -255,7 +257,8 @@ def test():
     img_path = './test_images/predict_img_2.jpg'
     test_image = Image.open(img_path)
 
-    model_path = params.model_dir
+    # model_path = params.model_dir
+    model_path = 'newModelTransfer'
     crop_dims = (65,100)
     stride = 40
 

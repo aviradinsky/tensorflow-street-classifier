@@ -131,13 +131,10 @@ def main(
                 if image is None:
                     continue
                 label = send[1].replace(' ','_')
-                if count_of_labels_dict[label] > 5000:
+                if count_of_labels_dict[label] > 5_000:
                     continue
                 else:
-                    if label == 'background':
-                        count_of_labels_dict[label] += 0.25
-                    else:
-                        count_of_labels_dict[label] += 1
+                    count_of_labels_dict[label] += 1
                 if count_of_labels_dict[label] % 8 == 0:
                     label = f'test/{label}'
                 else:
@@ -145,7 +142,5 @@ def main(
                 tf.keras.preprocessing.image.save_img(f'{directory}/{label}/{number_of_images_so_far}.jpg',image)
                 number_of_images_so_far += 1
                 if number_of_images_so_far % 1000 == 0:
-                    print(f'{number_of_images_so_far}')
-# %%
-main()
+                    print(f'Number of images sent to file directory so far: {number_of_images_so_far}')
 # %%
