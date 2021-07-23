@@ -170,7 +170,7 @@ def infer(model_path: str, test_image: Image.Image,
         im_class = classes[np.argmax(score)]
         # if im_class != 'background':
         #     print(score)
-        print(score)
+        # print(score)
         if tf.reduce_max(score).numpy() >= cutoff:
             top_preds.append((crops[i], bboxes[i], im_class, np.amax(score)))
             tally += 1
