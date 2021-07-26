@@ -13,22 +13,28 @@ def crop_tensor_by_nth_bbox(tensor, nth_bbox):
     """
     crop a tensor in the dataset by the nth tensor
     """
-
     bbox = tensor.get('objects').get('bbox').numpy()[nth_bbox]
     image = tensor.get('image')
-
-
-    top_line = bbox[0]*image.shape[0]
-    left_line = bbox[1]*image.shape[1]
-    bottom_line = bbox[2]*image.shape[0]
-    right_line = bbox[3]*image.shape[1]
-
+    #print(image.shape)
+    top_line = (bbox[0]*image.shape[0]) -10 
+    left_line = (bbox[1]*image.shape[1]) -10
+    bottom_line = (bbox[2]*image.shape[0]) +10
+    right_line = (bbox[3]*image.shape[1]) +10
+    if(top_line<0 or top_line>image.shape[0]):
+        top_line +=10
+    if(left_line<0 or left_line>image.shape[1]):
+        left_line +=10
+    if(bottom_line<0 or bottom_line>image.shape[0]):
+        bottom_line -=10
+    if(right_line<0 or right_line>image.shape[1]):
+        right_line -=10
+    #print(top_line,left_line,bottom_line,right_line)
     offset_height = int(top_line)
     offset_width = int(left_line)
     target_height = int(bottom_line - top_line)
     target_width = int(right_line - left_line)
-
-    if offset_height == 0 or offset_width == 0 or target_height <= 50 or target_width <= 50:
+    #print(offset_height,offset_width,target_height,target_width)
+    if offset_height == 0 or offset_width == 0 or target_height <= 17 or target_width <= 17:
         return None
     else:
         return tf.image.crop_to_bounding_box(image,
