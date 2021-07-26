@@ -27,11 +27,6 @@ val_dataset = tf.keras.preprocessing.image_dataset_from_directory(
     validation_split = 0.2,
     seed = 6
 )
-
-AUTOTUNE = tf.data.experimental.AUTOTUNE
-train_dataset = train_dataset.prefetch(buffer_size = AUTOTUNE)
-val_data = val_dataset.prefetch(buffer_size=AUTOTUNE)
-
 preprocess_input = tf.keras.applications.mobilenet_v2.preprocess_input
 base_model = tf.keras.applications.MobileNetV2(input_shape=image_size,
                                                include_top = False,
@@ -52,7 +47,6 @@ initial_epochs = 10
 history = model.fit(train_dataset, epochs = initial_epochs,
                     validation_data = val_dataset)
 
-# """
 ## Now do fine-tuning:
 base_model.trainable = True
 fine_tune_at = 100
@@ -66,18 +60,6 @@ total_epochs = initial_epochs + fine_tune_epochs
 history_fine = model.fit(train_dataset, epochs=total_epochs, initial_epoch=history.epoch[-1],
                          validation_data=val_dataset)
 
-base_model.trainable = True
-fine_tune_at = 100
-for layer in base_model.layers[:fine_tune_at]:
-    layer.trainable = False
-model.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-              optimizer = tf.keras.optimizers.RMSprop(lr=base_learning_rate/10),
-              metrics=['accuracy'])
-final_epochs = 10
-total_epochs = total_epochs + final_epochs
-history_fine = model.fit(train_dataset, epochs=total_epochs, initial_epoch=history.epoch[-1],
-                         validation_data=val_dataset)
-# """
 # %%
 test_data = tf.keras.preprocessing.image_dataset_from_directory(
     directory='newdata/test',
@@ -91,6 +73,7 @@ test_loss, test_acc = model.evaluate(test_data, verbose=2)
 print(f'test_acc = {test_acc}')
 #%%
 model.save(model_dir)
+
 # %%
-import confusionMatrix
+cm.matrix(model_dir)
 # %%
