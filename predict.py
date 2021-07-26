@@ -151,7 +151,7 @@ def infer(model_path: str, test_image: Image.Image,
 
     # run predict on all crops
     tally = 0
-    cutoff = .22
+    cutoff = .75
     # keep track of crops that meet cutoff
     top_preds = []
 
@@ -293,3 +293,8 @@ if __name__ == '__main__':
     test()
 
 # %%
+
+from PIL import Image
+
+img = Image.open('newdata/test/person/7461.jpg')
+print(img.size)
