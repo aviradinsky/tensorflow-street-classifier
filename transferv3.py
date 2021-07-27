@@ -1,9 +1,10 @@
 #%%
-import matplotlib.pyplot as plt
 from params import image_size, model_dir
 import tensorflow as tf
 import os
 import confusionMatrix as cm
+from focal_loss import sparse_categorical_focal_loss as categorical_focal_loss
+# Compatible with tensorflow backend
 #%%
 print(image_size[:2])
 #%%
@@ -40,9 +41,20 @@ x = tf.keras.layers.Dropout(0.2)(x)
 outputs = tf.keras.layers.Dense(num_classes)(x)
 model = tf.keras.Model(inputs, outputs)
 base_learning_rate = 0.0001
-model.compile(optimizer = tf.keras.optimizers.Adam(lr=base_learning_rate),
-              loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-              metrics=['accuracy'])
+loss = [categorical_focal_loss(
+    y_true=[i for i in range(num_classes)], 
+    y_pred=[
+        [0.8, 0.1, 0.1], 
+        [0.2, 0.7, 0.1], 
+        [0.2, 0.2, 0.6]
+    ], 
+    gamma=2)
+]
+model.compile(
+    loss=loss,
+    optimizer = tf.keras.optimizers.Adam(lr=base_learning_rate),
+    metrics=['accuracy']
+)
 initial_epochs = 10
 history = model.fit(train_dataset, epochs = initial_epochs,
                     validation_data = val_dataset)
@@ -52,9 +64,11 @@ base_model.trainable = True
 fine_tune_at = 100
 for layer in base_model.layers[:fine_tune_at]:
     layer.trainable = False
-model.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-              optimizer = tf.keras.optimizers.RMSprop(lr=base_learning_rate/10),
-              metrics=['accuracy'])
+model.compile(
+    loss=loss,
+    optimizer = tf.keras.optimizers.RMSprop(lr=base_learning_rate/10),
+    metrics=['accuracy']
+)
 fine_tune_epochs = 10
 total_epochs = initial_epochs + fine_tune_epochs
 history_fine = model.fit(train_dataset, epochs=total_epochs, initial_epoch=history.epoch[-1],
