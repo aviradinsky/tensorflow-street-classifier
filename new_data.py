@@ -34,7 +34,7 @@ def crop_tensor_by_nth_bbox(tensor, nth_bbox):
     target_height = int(bottom_line - top_line)
     target_width = int(right_line - left_line)
     #print(offset_height,offset_width,target_height,target_width)
-    if offset_height == 0 or offset_width == 0 or target_height <= 17 or target_width <= 17:
+    if offset_height == 0 or offset_width == 0 or target_height <= 50 or target_width <= 50:
         return None
     else:
         return tf.image.crop_to_bounding_box(image,
