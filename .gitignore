@@ -5,8 +5,10 @@ instances/
 cropped_images/
 saved_model/
 model
+model1/
 debugging/
 newdata/
+newdata1/
 newModel/
 newModelTransfer/
 predict_test/
