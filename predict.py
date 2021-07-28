@@ -149,10 +149,17 @@ def infer(model_path: str, test_image: Image.Image,
 
     # run predict on all crops
     tally = 0
-    cutoff = .75
+    cutoff = .9999999
     # keep track of crops that meet cutoff
     top_preds = []
-
+    top_bboxes =[]
+    top_scores =[]
+    indices=[]
+    for i in range(len(params.new_labels_list)):
+        top_preds.append([])
+        top_bboxes.append([])
+        top_scores.append([])
+        indices.append([])
     # convert crops to tensors
     tensors = [tf.convert_to_tensor(x) for x in crops]
     # turn into batch
@@ -171,22 +178,38 @@ def infer(model_path: str, test_image: Image.Image,
         score = tf.nn.softmax(pred)
         im_class = classes[np.argmax(score)]
         # filter out bboxes that are above the cutoff and not background
-        if tf.reduce_max(score).numpy() >= cutoff and im_class != 'background':
-            top_preds.append((crops[i], bboxes[i], im_class, np.amax(score)))
+        if tf.reduce_max(score).numpy() >= cutoff and im_class == 'background':
+            for i in range(len(classes)):
+                top_preds[i].append((crops[i], bboxes[i], im_class, np.amax(score)))
+            tally += 1
+        elif tf.reduce_max(score).numpy() >= cutoff:
+            top_preds[np.argmax(score)].append((crops[i], bboxes[i], im_class, np.amax(score)))
             tally += 1
 
     print(f'total crops with prob > {cutoff}: ', tally)
 
     # gather data to run nms
-    top_bboxes = [b for (a,b,c,d) in top_preds]
-    top_scores = [d for (a,b,c,d) in top_preds]
     max_output_size = 17
-    indices = nms(top_bboxes, top_scores, max_output_size=max_output_size)
+    iou_threshold= .25
+    for i in range(len(top_preds)):
+        if len(top_preds[i]) ==0:
+            print(top_preds[i])
+            continue
+        top_bboxes[i] = [b for (a,b,c,d) in top_preds[i]]
+        top_scores[i] = [d for (a,b,c,d) in top_preds[i]]
+        #print(classes[i], top_preds[i])
+        indices[i] = nms(top_bboxes[i], top_scores[i], max_output_size=max_output_size,  iou_threshold= iou_threshold)
     # make list of bboxes with accompanying model label predictions
+    # print(indices)
+    #print(tf.gather(top_bboxes, indices))
     bxs = []
-    for i in indices:
+    for i, list in enumerate(indices):
+        if len(list) ==0:
+            continue
+        print(classes[i],list)
+        for j in list:
         # tuples have order (bbox, label)
-        bxs.append((top_bboxes[i],top_preds[i][2]))
+            bxs.append((top_bboxes[i][j],top_preds[i][j][2]))
     # draw bboxes on image and display label underneath
     img_array = np.array(test_image.copy())
 
@@ -194,6 +217,9 @@ def infer(model_path: str, test_image: Image.Image,
     for tupl in bxs:
         bbox = tupl[0]
         label = tupl[1]
+        if label =='background':
+            print('found')
+            continue
         # opposite corners that define bbox
         pt1 = (bbox[0], bbox[1])
         pt2 = (bbox[2], bbox[3])
@@ -268,7 +294,7 @@ def infer_ss(model_path: str, image: Image.Image, display_img=True):
 def test():
     start = time.time()
     # get test image
-    img_path = './test_images/predict_img_2.jpg'
+    img_path = './test_images/predict_img.jpg'
     test_image = Image.open(img_path)
 
     # model_path = params.model_dir
