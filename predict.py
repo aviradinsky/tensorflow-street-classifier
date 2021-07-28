@@ -135,13 +135,11 @@ def infer(model_path: str, test_image: Image.Image,
         np.array: a numpy array of the image with bboxes and labels
     """
     if not os.path.exists(model_path):
-        import model_v2
+        import transferv3
 
     model = load_model(model_path)
 
     # find and resize images to model input size
-    # in_tensor = keras.backend.int_shape(model.layers[0].input)
-    # input_size = (in_tensor[1], in_tensor[2], in_tensor[3])
     input_size = params.image_size
    
     for i, crop in enumerate(crops):
@@ -293,8 +291,3 @@ if __name__ == '__main__':
     test()
 
 # %%
-
-from PIL import Image
-
-img = Image.open('newdata/test/person/7461.jpg')
-print(img.size)
