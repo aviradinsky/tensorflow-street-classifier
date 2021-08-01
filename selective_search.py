@@ -64,6 +64,8 @@ def selective_search(img: np.array, display_boxes=False):
         [0] and its bbox in the original image is stored at 
         position [1].  The order of the bbox is:
                                 (left, top, right, bottom)
+		Boxes with width or height less than or equal to 50 pixels
+		are filtered out and not returned by this function.
 	"""
 	# speed-up using multithreads
 	cv.setUseOptimized(True);
