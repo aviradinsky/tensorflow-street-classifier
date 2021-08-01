@@ -107,11 +107,14 @@ def selective_search(img: np.array, display_boxes=False):
 		right = x + w
 		lower = y + h
 		bbox = (left, upper, right, lower)
-		crops.append((crop, bbox))
-		if display_boxes:
-			# convert bounding boxes from (x, y, w, h) to (left,
-			# upper), (right, lower)
-			points.append(((x, y), (x + w, y + h)))
+		height = abs(lower - upper)
+		width = abs(right - left)
+		if height >= 50 and width >= 50:
+			crops.append((crop, bbox))
+			if display_boxes:
+				# convert bounding boxes from (x, y, w, h) to (left,
+				# upper), (right, lower)
+				points.append(((x, y), (x + w, y + h)))
 
 	if display_boxes:
 		display_bounding_boxes(img, points)
