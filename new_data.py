@@ -185,7 +185,7 @@ def main(directory = f'{os.getcwd()}', chosen_labels_string = params.new_labels)
     for key in valid_keys: # loop through train and validation sets
         for data in coco.get(key): # loop through each image in the set
             # to prevent unnecessary looping through entire dataset
-            if sum_counts_without_background(count_of_labels_dict) >= 80000 * (len(chosen_labels_string) - 1):
+            if sum_counts_without_background(count_of_labels_dict) >= 160000 * (len(chosen_labels_string) - 1):
                 return
             images_to_send = []
             image = data.get('image')
@@ -212,7 +212,7 @@ def main(directory = f'{os.getcwd()}', chosen_labels_string = params.new_labels)
                 label = send[0][1].replace(' ','_')
                 if label == 'truck':
                     label = 'car'
-                if count_of_labels_dict[label] > 80000:
+                if count_of_labels_dict[label] > 160000:
                     continue
                 if label == 'background':
                     imagecount += 4
@@ -248,7 +248,7 @@ def main(directory = f'{os.getcwd()}', chosen_labels_string = params.new_labels)
     print("open images")
     for sample in open_data:
         # to prevent unnecessary looping through entire dataset
-        if sum_counts_without_background(count_of_labels_dict) >= 80000 * (len(chosen_labels_string) - 1):
+        if sum_counts_without_background(count_of_labels_dict) >= 160000 * (len(chosen_labels_string) - 1):
             return
         i = Image.open(sample["filepath"])
         height = i.height
@@ -261,7 +261,7 @@ def main(directory = f'{os.getcwd()}', chosen_labels_string = params.new_labels)
             label = box['label'].lower().replace(" ", "_")
             if(label =="truck"):
                 label = "car"
-            if count_of_labels_dict.get(label,"no") == "no" or count_of_labels_dict[label] > 80000:
+            if count_of_labels_dict.get(label,"no") == "no" or count_of_labels_dict[label] > 160000:
                 continue
             cropSize = (box["bounding_box"][0] * width,
                         box["bounding_box"][1] * height,
@@ -280,7 +280,7 @@ def main(directory = f'{os.getcwd()}', chosen_labels_string = params.new_labels)
                 raise ValueError(f'unexpected bbox class: {label}')
             if label == 'background':
                 raise ValueError('unexpected class: background')
-            if count_of_labels_dict[label] > 80000:
+            if count_of_labels_dict[label] > 160000:
                 continue
             imagecount += 1
             # crop is tuple of (image, label)
