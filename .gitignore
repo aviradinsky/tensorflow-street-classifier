@@ -1,15 +1,6 @@
 .vscode/settings.json
 __pycache__/
 data/
-instances/
-cropped_images/
-saved_model/
-model
-model1/
-debugging/
-newdata/
-newdata1/
-newdatatest/
-newModel/
-newModelTransfer/
+model/
 predict_test/
+nohup.out
