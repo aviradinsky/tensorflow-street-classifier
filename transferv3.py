@@ -67,7 +67,7 @@ history_fine = model.fit(train_dataset, epochs=total_epochs, initial_epoch=histo
 
 # %%
 test_data = tf.keras.preprocessing.image_dataset_from_directory(
-    directory=f'{data_dir}}/test',
+    directory=f'{data_dir}/test',
     labels='inferred',
     label_mode='int',
     color_mode='rgb',
