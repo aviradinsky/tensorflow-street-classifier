@@ -119,7 +119,7 @@ def sum_counts_without_background(counts: dict):
 
 # %%
 
-def main(directory = f'{os.getcwd()}', chosen_labels_string = new_labels_list)
+def main(directory = f'{os.getcwd()}', chosen_labels_string = new_labels_list):
     all_labels = all_possible_labels
     all_labels.append('background')
 
