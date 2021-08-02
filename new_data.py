@@ -306,6 +306,11 @@ def main(directory = f'{os.getcwd()}', chosen_labels_string = new_labels_list):
                     for j in range(len(send)):
                         if (count_of_labels_dict[label] - j) % 40 == 0:
                             reached_test_mark = True
+                            
+# %%
+
+if __name__ == '__main__':
+    main()
 
 # %%
 # code to empty directories without deleting them
@@ -320,4 +325,3 @@ def main(directory = f'{os.getcwd()}', chosen_labels_string = new_labels_list):
 #             final = os.path.join(file_path, f)
 #             os.remove(final)
 
-# %%
