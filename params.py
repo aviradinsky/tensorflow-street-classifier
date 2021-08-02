@@ -1,17 +1,18 @@
-chosen_labels = [
-    'bicycle',
-    'motorcycle',
-    'bus',
-    'truck',
-    'car',
-    'train',
-    'person',
-    'traffic light',
-    'stop sign',
-    'fire hydrant'
-]
+# %%
+
 image_size = (160,160,3)
 model_dir = 'model'
+data_dir = 'data'
+
+new_labels_list = [
+    'background',
+    'bicycle',
+    'car',
+    'motorcycle',
+    'person',
+    'train',    
+]
+
 all_possible_labels = [
     'person',
     'bicycle',
@@ -95,33 +96,4 @@ all_possible_labels = [
     'toothbrush',
 ]
 
-label_list = [
-    'background',
-    'bicycle',
-    'bus',
-    'car',
-    'fire hydrant',
-    'motorcycle',
-    'person',
-    'stop sign',
-    'traffic light',
-    'train',
-    'truck',
-]
-new_labels = [
-    'bicycle',
-    'motorcycle',
-    'truck',
-    'car',
-    'train',
-    'person',
-]
-new_labels_list = [
-    'background',
-    'bicycle',
-    'car',
-    'motorcycle',
-    'person',
-    'train',
-    
-]
+# %%

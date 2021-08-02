@@ -12,8 +12,6 @@ import random
 import sys
 import os
 
-import params
-
 # %%
 
 def display_image(img):

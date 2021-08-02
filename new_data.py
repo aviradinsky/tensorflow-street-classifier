@@ -6,10 +6,10 @@ from tensorflow.python.keras.backend import convert_inputs_if_ragged
 from tensorflow.image import crop_to_bounding_box as crop_bbox
 import tensorflow_datasets as tfds
 import os
-import params
 import fiftyone as fo
 import fiftyone.zoo as foz
 from PIL import Image
+from params import data_dir, new_labels_list, all_possible_labels
 
 # %%
 def crop_tensor_by_nth_bbox(tensor, nth_bbox):
@@ -119,16 +119,15 @@ def sum_counts_without_background(counts: dict):
 
 # %%
 
-def main(directory = f'{os.getcwd()}', chosen_labels_string = params.new_labels):
-    lines = open('misc/objects-label.labels.txt','r').readlines()
-    all_possible_labels = [line.strip() for line in lines]
-    all_possible_labels.append('background')
+def main(directory = f'{os.getcwd()}', chosen_labels_string = new_labels_list)
+    all_labels = all_possible_labels
+    all_labels.append('background')
 
     for label in chosen_labels_string:
-        if label not in all_possible_labels:
+        if label not in all_labels:
             raise Exception(f'No such label as {label}')
 
-    directory = f'{directory}/newdatatest'
+    directory = f'{directory}/{data_dir}'
 
     dont_need_to_continue = False
 
@@ -161,8 +160,8 @@ def main(directory = f'{os.getcwd()}', chosen_labels_string = params.new_labels)
     """
     chosen_labels_int = []
     for label in chosen_labels_string:
-        if label in all_possible_labels:
-            chosen_labels_int.append(all_possible_labels.index(label))
+        if label in all_labels:
+            chosen_labels_int.append(all_labels.index(label))
     print(chosen_labels_int)
     coco = tfds.load('coco')
     open_data = foz.load_zoo_dataset(
@@ -185,7 +184,7 @@ def main(directory = f'{os.getcwd()}', chosen_labels_string = params.new_labels)
     for key in valid_keys: # loop through train and validation sets
         for data in coco.get(key): # loop through each image in the set
             # to prevent unnecessary looping through entire dataset
-            if sum_counts_without_background(count_of_labels_dict) >= 80000 * (len(chosen_labels_string) - 1):
+            if sum_counts_without_background(count_of_labels_dict) >= 160000 * (len(chosen_labels_string) - 1):
                 return
             images_to_send = []
             image = data.get('image')
@@ -198,7 +197,7 @@ def main(directory = f'{os.getcwd()}', chosen_labels_string = params.new_labels)
                     crops = crop_tensor_by_nth_bbox(data, n)
                     if crops is None:
                         continue
-                    label_list = [all_possible_labels[int_label]] * len(crops)
+                    label_list = [all_labels[int_label]] * len(crops)
                     zipped = list(zip(crops, label_list))
                     images_to_send.append(zipped)
             if len(images_to_send) == 0: # this img only conains background
@@ -212,7 +211,7 @@ def main(directory = f'{os.getcwd()}', chosen_labels_string = params.new_labels)
                 label = send[0][1].replace(' ','_')
                 if label == 'truck':
                     label = 'car'
-                if count_of_labels_dict[label] > 80000:
+                if count_of_labels_dict[label] > 160000:
                     continue
                 if label == 'background':
                     imagecount += 4
@@ -248,7 +247,7 @@ def main(directory = f'{os.getcwd()}', chosen_labels_string = params.new_labels)
     print("open images")
     for sample in open_data:
         # to prevent unnecessary looping through entire dataset
-        if sum_counts_without_background(count_of_labels_dict) >= 80000 * (len(chosen_labels_string) - 1):
+        if sum_counts_without_background(count_of_labels_dict) >= 160000 * (len(chosen_labels_string) - 1):
             return
         i = Image.open(sample["filepath"])
         height = i.height
@@ -261,7 +260,7 @@ def main(directory = f'{os.getcwd()}', chosen_labels_string = params.new_labels)
             label = box['label'].lower().replace(" ", "_")
             if(label =="truck"):
                 label = "car"
-            if count_of_labels_dict.get(label,"no") == "no" or count_of_labels_dict[label] > 80000:
+            if count_of_labels_dict.get(label,"no") == "no" or count_of_labels_dict[label] > 160000:
                 continue
             cropSize = (box["bounding_box"][0] * width,
                         box["bounding_box"][1] * height,
@@ -276,11 +275,11 @@ def main(directory = f'{os.getcwd()}', chosen_labels_string = params.new_labels)
             images_to_send.append(zipped)
         for send in images_to_send:
             label = send[0][1]
-            if label not in params.new_labels_list:
+            if label not in new_labels_list:
                 raise ValueError(f'unexpected bbox class: {label}')
             if label == 'background':
                 raise ValueError('unexpected class: background')
-            if count_of_labels_dict[label] > 80000:
+            if count_of_labels_dict[label] > 160000:
                 continue
             imagecount += 1
             # crop is tuple of (image, label)
@@ -307,11 +306,6 @@ def main(directory = f'{os.getcwd()}', chosen_labels_string = params.new_labels)
                     for j in range(len(send)):
                         if (count_of_labels_dict[label] - j) % 40 == 0:
                             reached_test_mark = True
-
-# %%
-
-chosen_labels_string = params.new_labels_list
-main(chosen_labels_string=chosen_labels_string)
 
 # %%
 # code to empty directories without deleting them

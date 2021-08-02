@@ -24,22 +24,6 @@ import params
 
 # %%
 
-# classes = {
-#     0:   'bike',
-#     1:   'motorcycle',
-#     2:   'bus',
-#     3:   'truck',
-#     4:   'car',
-#     5:   'train',
-#     6:   'person',
-#     7:   'traffic light',
-#     8:   'stop sign',
-#     9:   'fire hydrant',
-#     10: 'background'
-# }
-# classes = params.chosen_labels
-# classes.append("background")
-# classes.sort()
 classes = params.new_labels_list
 
 # %%
@@ -48,6 +32,7 @@ def display_image(image):
     plt.imshow(image)
     plt.axis('off')
     plt.show()
+
 # %%
 
 def load_model(filepath, show_summary=False):
@@ -190,7 +175,7 @@ def infer(model_path: str, test_image: Image.Image,
 
     # gather data to run nms
     max_output_size = 17
-    iou_threshold= .25
+    iou_threshold= .1
     for i in range(len(top_preds)):
         if len(top_preds[i]) ==0:
             print(top_preds[i])
@@ -297,8 +282,7 @@ def test():
     img_path = './test_images/predict_img.jpg'
     test_image = Image.open(img_path)
 
-    # model_path = params.model_dir
-    model_path = 'model'
+    model_path = params.model_dir
     crop_dims = (65,100)
     stride = 40
 

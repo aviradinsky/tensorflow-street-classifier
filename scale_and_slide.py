@@ -15,7 +15,6 @@ def simple_display_image(img: Image.Image):
     Args:
         img (PIL.Image.Image): image to display
     """
-
     plt.imshow(img)
     plt.show()
 
@@ -230,7 +229,7 @@ def get_image_chunks(img: Image.Image, window_dim: tuple, stride: int,
 # SAMPLE TEST
 # ************************************
 def test():
-    img = Image.open('cropped_images/train/1/173.png')
+    img = Image.open('test_images/predict_img.jpg')
     simple_display_image(img)
 
     window_dimensions = (75, 100)

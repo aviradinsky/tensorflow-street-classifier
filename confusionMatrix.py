@@ -5,11 +5,11 @@ import matplotlib.pyplot as plt
 import os
 import numpy as np
 import seaborn as sns
-import params
+from params import new_labels_list, data_dir
 #%%
 def matrix(modelname):
     model = tf.keras.models.load_model(modelname)
-    directory = f'{os.getcwd()}/newdata/'
+    directory = f'{os.getcwd()}/{data_dir}/'
     image_size = (160,160,3)
     test_data = tf.keras.preprocessing.image_dataset_from_directory(
         directory=f'{directory}/test',
@@ -45,7 +45,7 @@ def matrix(modelname):
         test_acc = sum(y_pred[i] == y_true[i]) / len(y_true[i]) 
         print(f'Test set accuracy: {test_acc}') #per batch
 
-    objects = params.new_labels_list
+    objects = new_labels_list
     confusion_mtx= np.zeros((6,6))
     for x in range(len(y_pred)): #merge all batches into one matrix
         confusion_mtx += tfds.as_numpy(tf.math.confusion_matrix(y_true[x], y_pred[x], num_classes=6)) 
