@@ -279,7 +279,7 @@ def infer_ss(model_path: str, image: Image.Image, display_img=True):
 def test():
     start = time.time()
     # get test image
-    img_path = './test_images/predict_img.jpg'
+    img_path = './test_images/inference_img_0.jpg'
     test_image = Image.open(img_path)
 
     model_path = params.model_dir

@@ -229,7 +229,7 @@ def get_image_chunks(img: Image.Image, window_dim: tuple, stride: int,
 # SAMPLE TEST
 # ************************************
 def test():
-    img = Image.open('test_images/predict_img.jpg')
+    img = Image.open('test_images/inference_img_0.jpg')
     simple_display_image(img)
 
     window_dimensions = (75, 100)

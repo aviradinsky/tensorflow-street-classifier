@@ -46,7 +46,7 @@ for img in images:
 
 #  %%
 # save plain image and image with bboxes to directory
-directory = './predict_test'
+directory = './inference_test'
 
 if not os.path.exists(directory):
     os.makedirs(directory)

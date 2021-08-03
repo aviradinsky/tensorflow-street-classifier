@@ -44,7 +44,6 @@ def display_bounding_boxes(img: np.array, points: list):
 		plt.imshow(copy)
 		plt.show()
 
-		# copy = cv.cvtColor(cv.imread('./test_images/predict_img.jpg'), cv.COLOR_BGR2RGB)
 		copy = img.copy()
 
 #%%
@@ -126,7 +125,7 @@ def selective_search(img: np.array, display_boxes=False):
 #%%
 
 def test():
-	image = cv.cvtColor(cv.imread('./test_images/predict_img.jpg'), cv.COLOR_BGR2RGB)
+	image = cv.cvtColor(cv.imread('./test_images/inference_img_0.jpg'), cv.COLOR_BGR2RGB)
 	crops = selective_search(image, display_boxes=True)
 	# get just the pictures
 	crops = [img for img, tup in crops]
