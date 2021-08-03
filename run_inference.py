@@ -1,9 +1,9 @@
 # %%
 
-from predict import infer_ss
+from inference import infer_ss
 from PIL import Image
 import tensorflow_datasets as tfds
-from predict import display_image as di
+from inference import display_image as di
 import os
 import params
 
