@@ -4,7 +4,7 @@ from tensorflow.keras import layers
 from tensorflow.keras.models import Sequential
 import matplotlib.pyplot as plt
 from tensorflow.python.keras.layers.core import Dropout
-import new_data
+import download_data
 import os
 from params import chosen_labels, image_size, model_dir, new_labels, data_dir
 # %%
@@ -12,7 +12,7 @@ from params import chosen_labels, image_size, model_dir, new_labels, data_dir
 """
 this loads all of the data from the tfds into folders
 """
-new_data.main()
+download_data.main()
 # %%
 directory = f'{os.getcwd()}/{datadir}'
 

@@ -120,7 +120,7 @@ def infer(model_path: str, test_image: Image.Image,
         np.array: a numpy array of the image with bboxes and labels
     """
     if not os.path.exists(model_path):
-        import transferv3
+        import transfer_model
 
     model = load_model(model_path)
 
