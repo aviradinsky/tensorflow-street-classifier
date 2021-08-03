@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import os
 import numpy as np
 import seaborn as sns
-from params import new_labels_list, data_dir
+from params import new_labels_list, data_dir, model_dir
 #%%
 def matrix(modelname):
     model = tf.keras.models.load_model(modelname)
@@ -49,13 +49,18 @@ def matrix(modelname):
     confusion_mtx= np.zeros((6,6))
     for x in range(len(y_pred)): #merge all batches into one matrix
         confusion_mtx += tfds.as_numpy(tf.math.confusion_matrix(y_true[x], y_pred[x], num_classes=6)) 
-    plt.figure(figsize=(6, 6))
+    fig = plt.figure(figsize=(10, 10))
     confusion_mtx = confusion_mtx/confusion_mtx.sum(axis=1)[:, tf.newaxis]
     sns.heatmap(confusion_mtx, xticklabels= objects, yticklabels= objects, annot=True, fmt='.2%')
     plt.xlabel('Prediction')
     plt.ylabel('Label')
     plt.show()
+    fig.savefig('confusion_matrix.jpg')
   
 #%%
 
+if __name__ == '__main__':
+    matrix(model_dir)
+
 # %%
+
