@@ -5,7 +5,7 @@ import tensorflow as tf
 import os
 import confusionMatrix as cm
 #%%
-print(image_size[:2])
+print(f'input image size: {image_size[:2]}')
 #%%
 trainval_dir = os.path.join(data_dir, 'train')
 num_classes = len(os.listdir(trainval_dir))
