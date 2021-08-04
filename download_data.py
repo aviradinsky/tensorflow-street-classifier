@@ -235,7 +235,7 @@ def main(directory = f'{os.getcwd()}', chosen_labels_string = new_labels_list):
                     if num_saved_imgs % 1000 == 0:
                         print("number of used :" + str(num_saved_imgs) + " images used: " + str(imagecount))
                     # if img is test image, only save first crop
-                    if full_label[0:4] == 'test' and full_label[5:9] is not 'back':
+                    if full_label[0:4] == 'test' and full_label[5:9] != 'back':
                         break
                     # check to see if this round pushed total over level
                     # where image should be sent to test set
