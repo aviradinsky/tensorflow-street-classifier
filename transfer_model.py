@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from params import image_size, model_dir, data_dir
 import tensorflow as tf
 import os
-import confusionMatrix as cm
+import confusion_matrix as cm
 #%%
 print(f'input image size: {image_size[:2]}')
 #%%
