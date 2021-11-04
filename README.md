@@ -1,6 +1,6 @@
 # About
 
-Tensorflow Street Classifier is repo containing the ML project of YU Students [Nissim Cantor](https://www.linkedin.com/in/nissim-cantor-b1988b19a/), 
+Tensorflow Street Classifier is a repo containing the ML project of YU Students [Nissim Cantor](https://www.linkedin.com/in/nissim-cantor-b1988b19a/), 
 [Avi Radinsky](https://www.linkedin.com/in/avi-radinsky/), and [Jacob Silbiger](https://www.linkedin.com/in/jacob-silbiger-0521081b5/), with the help 
 from our mentor, [Gershom Kutliroff](https://www.linkedin.com/in/gershom-kutliroff-9a89611/). Using the COCO and Open Images datasets, we developed 
 and trained a transfer learning model in Tensorflow with test accuracy over 95%. Our goal was to create a model similar to the ones used in
